@@ -1,0 +1,56 @@
+<component name="ArtifactManager">
+  <artifact type="exploded-war" name="SCMatchmaker:war exploded">
+    <output-path>$PROJECT_DIR$/target/SCMatchmaker-1.0-SNAPSHOT</output-path>
+    <properties id="maven-jee-properties">
+      <options>
+        <exploded>true</exploded>
+        <module>SCMatchmaker</module>
+        <packaging>war</packaging>
+      </options>
+    </properties>
+    <root id="root">
+      <element id="directory" name="WEB-INF">
+        <element id="directory" name="classes">
+          <element id="module-output" name="SCMatchmaker" />
+        </element>
+        <element id="directory" name="lib">
+          <element id="library" level="project" name="Maven: com.discord4j:discord4j-core:3.1.5" />
+          <element id="library" level="project" name="Maven: com.discord4j:discord-json:1.5.10" />
+          <element id="library" level="project" name="Maven: com.discord4j:discord-json-api:1.5.10" />
+          <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-databind:2.11.4" />
+          <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-annotations:2.11.4" />
+          <element id="library" level="project" name="Maven: com.fasterxml.jackson.core:jackson-core:2.11.4" />
+          <element id="library" level="project" name="Maven: com.fasterxml.jackson.datatype:jackson-datatype-jdk8:2.11.4" />
+          <element id="library" level="project" name="Maven: com.discord4j:discord4j-rest:3.1.5" />
+          <element id="library" level="project" name="Maven: com.discord4j:discord4j-common:3.1.5" />
+          <element id="library" level="project" name="Maven: io.projectreactor.netty:reactor-netty:0.9.18.RELEASE" />
+          <element id="library" level="project" name="Maven: io.netty:netty-codec-http:4.1.60.Final" />
+          <element id="library" level="project" name="Maven: io.netty:netty-common:4.1.60.Final" />
+          <element id="library" level="project" name="Maven: io.netty:netty-buffer:4.1.60.Final" />
+          <element id="library" level="project" name="Maven: io.netty:netty-transport:4.1.60.Final" />
+          <element id="library" level="project" name="Maven: io.netty:netty-codec:4.1.60.Final" />
+          <element id="library" level="project" name="Maven: io.netty:netty-codec-http2:4.1.60.Final" />
+          <element id="library" level="project" name="Maven: io.netty:netty-handler:4.1.60.Final" />
+          <element id="library" level="project" name="Maven: io.netty:netty-resolver:4.1.60.Final" />
+          <element id="library" level="project" name="Maven: io.netty:netty-handler-proxy:4.1.60.Final" />
+          <element id="library" level="project" name="Maven: io.netty:netty-codec-socks:4.1.60.Final" />
+          <element id="library" level="project" name="Maven: io.netty:netty-transport-native-epoll:linux-x86_64:4.1.60.Final" />
+          <element id="library" level="project" name="Maven: io.netty:netty-transport-native-unix-common:4.1.60.Final" />
+          <element id="library" level="project" name="Maven: com.discord4j:discord4j-gateway:3.1.5" />
+          <element id="library" level="project" name="Maven: io.projectreactor.addons:reactor-extra:3.3.5.RELEASE" />
+          <element id="library" level="project" name="Maven: io.projectreactor:reactor-core:3.3.13.RELEASE" />
+          <element id="library" level="project" name="Maven: org.reactivestreams:reactive-streams:1.0.3" />
+          <element id="library" level="project" name="Maven: com.discord4j:discord4j-voice:3.1.5" />
+          <element id="library" level="project" name="Maven: com.discord4j:simple-fsm:1.0.1" />
+          <element id="library" level="project" name="Maven: com.discord4j:stores-jdk:3.1.6" />
+          <element id="library" level="project" name="Maven: com.discord4j:stores-api:3.1.6" />
+          <element id="library" level="project" name="Maven: com.austinv11.servicer:Servicer:1.0.3" />
+        </element>
+      </element>
+      <element id="directory" name="META-INF">
+        <element id="file-copy" path="$PROJECT_DIR$/target/SCMatchmaker-1.0-SNAPSHOT/META-INF/MANIFEST.MF" />
+      </element>
+      <element id="javaee-facet-resources" facet="SCMatchmaker/web/Web" />
+    </root>
+  </artifact>
+</component>
