@@ -52,4 +52,18 @@ public class Bot {
         //to use a daemon thread?
         client.onDisconnect().block();
     }
+
+    //this is the command each server can setup to customize their bot, if need be. Right now it is static.
+    //I don't actually want to do this because its time consuming and can become burdensome on the bot if not handled
+    //correctly, which I don't think I can haha. We can talk about this later.
+    public static String cmdChar(){
+        return("!");
+    }
+
+    //I just decided to make my own method for handling sending messages back to Discord. Its completely unnecessary,
+    //but it is shorter than typing it all out. the Return block shows the full way to send a message, just replace
+    //text with "strings go here" to send a message yourself.
+    public static Message sendMessage(Message message, String text){
+        return (message.getChannel().block().createMessage(text).block());
+    }
 }
