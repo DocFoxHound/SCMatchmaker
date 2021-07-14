@@ -1,6 +1,7 @@
 package SCMatchmaker;
 
 import discord4j.core.object.entity.Message;
+
 import java.util.Locale;
 
 
@@ -24,8 +25,12 @@ public class CommandService {
             }
             //here we are recognizing the queue command and passing off the message data to another method to handle.
             else if(command.startsWith("queue")){
-                Bot.sendMessage(message, "Updating ELO...");
+                Bot.sendMessage(message, "//Testing getting info from the database...");
                 QueueService.queuing(message);
+            }
+            else if(command.startsWith("scrape")){
+                Bot.sendMessage(message, "//TODO ScraperScrape stuff");
+                ScraperScrape.scrape(message);
             }
             else{
                 Bot.sendMessage(message, "Command unrecognized.");

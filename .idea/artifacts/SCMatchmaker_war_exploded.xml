@@ -45,6 +45,8 @@
           <element id="library" level="project" name="Maven: com.discord4j:stores-jdk:3.1.6" />
           <element id="library" level="project" name="Maven: com.discord4j:stores-api:3.1.6" />
           <element id="library" level="project" name="Maven: com.austinv11.servicer:Servicer:1.0.3" />
+          <element id="library" level="project" name="Maven: mysql:mysql-connector-java:8.0.25" />
+          <element id="library" level="project" name="Maven: com.google.protobuf:protobuf-java:3.11.4" />
         </element>
       </element>
       <element id="directory" name="META-INF">
