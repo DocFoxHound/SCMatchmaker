@@ -5,15 +5,12 @@ import org.openqa.selenium.By;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.Select;
 import org.openqa.selenium.support.ui.WebDriverWait;
-
-import java.util.List;
 
 public class ScraperScrape {
     public static void scrape(Message message){
         try{
-            //setting properties for the driver
+            //setting properties for the headless driver
             System.setProperty("webdriver.chrome.driver", "src/main/resources/chromedriver.exe");
             //ChromeOptions options = new ChromeOptions();
             //options.addArguments("--headless");
@@ -24,40 +21,53 @@ public class ScraperScrape {
             ChromeDriver driver = new ChromeDriver();
 
             //initializing the wait driver (allows things to load) with maximum wait time in int
-            WebDriverWait wait = new WebDriverWait(driver, 30);
+            WebDriverWait wait = new WebDriverWait(driver, 5);
 
             //navigate to a website
             driver.navigate().to("https://robertsspaceindustries.com/community/leaderboards/all?mode=BR");
 
-            //click the dropdown button
-            Select season = new Select(driver.findElement(By.name("Season")));
+            //save the xPath of the season dropdown menu
+            String seasonButton = "//*[@id=\"leaderboard-filters\"]/div[3]/div[2]/fieldset[3]/a";
 
-            //save the location of the button
-            String seasonButton = "//button[text()='v 3.13']";
-
-            //we wait until the button is loaded
+            //wait until the dropdown menu is loaded on the page before clicking it
             wait.until(ExpectedConditions.elementToBeClickable(By.xpath(seasonButton)));
 
-            //click on the button
+            //click the dropdown menu
             driver.findElement(By.xpath(seasonButton)).click();
-            //driver.findElement(By.linkText("v 3.13")).click();
 
-            //save the location of the data that we want
-            String languagesParagraphXpath = "//*[@id=\"page1\"]/div[2]/div[5]";
+            //get the xPath value of 3.11
+            String onlyWorkingSeason = "//*[@id=\"leaderboard-filters\"]/div[3]/div[2]/fieldset[3]/a/ul/li[3]";
 
-            //wait until that location is loaded
-            wait.until(ExpectedConditions.visibilityOfElementLocated(By.xpath(languagesParagraphXpath)));
+            //click 3.11
+            driver.findElement(By.xpath(onlyWorkingSeason)).click();
+
+            //get the Find Player textbox
+            WebElement findPlayer = driver.findElement(By.xpath("//*[@id=\"leaderboard-filters\"]/div[3]/div[2]/fieldset[1]/div/div/input"));
+
+            //look for Mirky
+            findPlayer.sendKeys("MirkyWater"); //this will be replaced with the user's SCHandle from the database
+
+            //save the xPath of the season dropdown menu
+            String userPopOut = "//*[@id=\"leaderboard-filters\"]/div[3]/div[2]/fieldset[1]/div/div/div";
+
+            //wait until the user is visible as it sometimes takes a moment
+            wait.until(ExpectedConditions.elementToBeClickable(By.xpath(userPopOut)));
+
+            //click the user
+            driver.findElement(By.xpath(userPopOut)).click();
+
+
 
             //Retrieve a list of WebElements (representing a <p>) that contains languages
-            List<WebElement> languageNamesList = driver.findElements(By.xpath("//*[@id=\"page1\"]/div[2]/div[5]/p"));
+            //List<WebElement> languageNamesList = driver.findElements(By.xpath("//*[@id=\"page1\"]/div[2]/div[5]/p"));
 
             //close the window
-            driver.close();
+            //driver.close();
 
             //iterate through details
-            for (int i = 0; i < languageNamesList.size(); i++){
-                Bot.sendMessage(message, languageNamesList.get(i).toString());
-            }
+            //for (int i = 0; i < languageNamesList.size(); i++){
+            //    Bot.sendMessage(message, languageNamesList.get(i).toString());
+            //}
 
         }catch(Exception e){
             Bot.sendMessage(message, "Scraping Error: " + e);
