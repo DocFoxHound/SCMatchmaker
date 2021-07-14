@@ -24,7 +24,7 @@ public class CommandService {
             }
             //here we are recognizing the queue command and passing off the message data to another method to handle.
             else if(command.startsWith("queue")){
-                Bot.sendMessage(message, "Queuing for Matchmaking...");
+                Bot.sendMessage(message, "Updating ELO...");
                 QueueService.queuing(message);
             }
             else{

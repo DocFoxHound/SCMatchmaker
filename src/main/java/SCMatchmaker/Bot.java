@@ -16,7 +16,8 @@ public class Bot {
 
     public static void main(String[] args) {
         //logging into the bot and keeping it logged in
-        GatewayDiscordClient client = DiscordClientBuilder.create("ODU4Mzk1MTU4MjUxOTYyMzg4.YNdgyQ.6GLFlhhhE1HSGJfw0Fh_wvTurGQ")
+        String token = "ODU4Mzk1MTU4MjUxOTYyMzg4.YNdgyQ.6GLFlhhhE1HSGJfw0Fh_wvTurGQ";
+        GatewayDiscordClient client = DiscordClientBuilder.create(token)
                 .build()
                 .login()
                 .block();
