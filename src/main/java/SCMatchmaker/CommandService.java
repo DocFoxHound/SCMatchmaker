@@ -29,7 +29,7 @@ public class CommandService {
                 QueueService.queuing(message);
             }
             else if(command.startsWith("scrape")){
-                Bot.sendMessage(message, "//TODO ScraperScrape stuff");
+                Bot.sendMessage(message, "//Testing some scraping...");
                 ScraperScrape.scrape(message);
             }
             else{
