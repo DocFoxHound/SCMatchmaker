@@ -28,9 +28,12 @@ public class CommandService {
                 Bot.sendMessage(message, "//Testing getting info from the database...");
                 QueueService.queuing(message);
             }
-            else if(command.startsWith("scrape")){
-                Bot.sendMessage(message, "//Testing some scraping...");
-                ScraperScrape.scrape(message);
+            else if(command.startsWith("newuser")){
+                Bot.sendMessage(message, "Verifying Profile Page...");
+                newuser.newUser(message);
+            }
+            else if(command.startsWith("updateme")){
+                Bot.sendMessage(message, "This command has not yet been finished.");
             }
             else{
                 Bot.sendMessage(message, "Command unrecognized.");
