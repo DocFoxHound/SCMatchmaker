@@ -31,9 +31,9 @@ public class QueueService {
             //by the way, this is checking to see if said user exists.
             if (rs.next() == false)
             {
-                Bot.sendMessage(message, "You are a new user, please use the new user command with your discord profile" +
-                        "link afterwards. It should look similar to the following:");
-                Bot.sendMessage(message, "!newuser https://robertsspaceindustries.com/citizens/**YOUR_HANDLE_HERE**");
+                Bot.sendMessage(message, "Please use the new user command with your discord profile" +
+                        "link afterwards. It should look similar to the following: \n" +
+                        "!newuser https://robertsspaceindustries.com/citizens/YOUR_HANDLE_HERE");
                 conn.close();
             }else{//if the user exists...
                 //start the queue logic
