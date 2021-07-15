@@ -108,7 +108,6 @@ public class ScraperScrape {
 
             //return the results as an array. There are 16 results total
             return resultsArray;
-
         }catch(Exception e){
             Bot.sendMessage(message, "Scraping Error: " + e);
         }

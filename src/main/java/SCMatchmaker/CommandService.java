@@ -25,7 +25,7 @@ public class CommandService {
             }
             //here we are recognizing the queue command and passing off the message data to another method to handle.
             else if(command.startsWith("queue")){
-                Bot.sendMessage(message, "//Testing getting info from the database...");
+                Bot.sendMessage(message, "//The queue command is currently unfinished.");
                 QueueService.queuing(message);
             }
             else if(command.startsWith("newuser")){
@@ -33,7 +33,7 @@ public class CommandService {
                 newuser.newUser(message);
             }
             else if(command.startsWith("updateme")){
-                Bot.sendMessage(message, "This command has not yet been finished.");
+                Bot.sendMessage(message, "The updateme command is still in the works.");
             }
             else{
                 Bot.sendMessage(message, "Command unrecognized.");

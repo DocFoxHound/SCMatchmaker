@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
+//verifies that a userpage does, in fact, exist, and returns a list of some details
 public class CheckProfilePage {
     public static List<String> checkPage(String url, Message message){
 
@@ -57,7 +58,10 @@ public class CheckProfilePage {
                     "is located inside your StarCitizen Bio:");
             Bot.sendMessage(message, "**MatchMakerVerified**");
             driver.close();
-            return null;
+
+            List<String> emptyArray = new ArrayList<>();
+            emptyArray.add("");
+            return emptyArray;
         }
     }
 }

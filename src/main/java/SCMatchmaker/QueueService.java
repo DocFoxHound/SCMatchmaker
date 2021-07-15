@@ -3,8 +3,6 @@ package SCMatchmaker;
 import discord4j.core.object.entity.Message;
 
 import java.sql.*;
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 
 //This is the queue method, which will handle a lot of stuff.
 public class QueueService {
@@ -38,19 +36,11 @@ public class QueueService {
                 Bot.sendMessage(message, "!newuser https://robertsspaceindustries.com/citizens/**YOUR_HANDLE_HERE**");
                 conn.close();
             }else{//if the user exists...
-                //parse the data. You can use this to store several people if the query gets multiple people.
+                //start the queue logic
                 while (rs.next()){
-                    int id = rs.getInt("id");
                     String scHandle = rs.getString("schandle");
-                    int ueeCitizenRecord = rs.getInt("ueecitizenrecord");
                     String discordUsername = rs.getString("discordusername");
                     long discordID = rs.getLong("discordid");
-                    String scOrgSID = rs.getString("scorgsid");
-                    int rating = rs.getInt("rating");
-                    double scorePerMinute = rs.getDouble("scoreperminute");
-                    double killDeath = rs.getDouble("killdeath");
-                    DateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
-                    Time playTime = rs.getTime("playtime");
                     double ELO = rs.getDouble("elo");
                     conn.close();
                 }
