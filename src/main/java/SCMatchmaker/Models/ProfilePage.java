@@ -3,20 +3,37 @@ import java.util.Date;
 
 public Class ProfilePage {
     private int rating;
-    private int scoreMinute;
     private int score;
-    private double damageRatio;
-    private double killDeath;
-    private Date playtime;
+    private int playtime; //playtime recorded in terms of minutes
+    private int scoreMinute;
+    private int damageDealt;
+    private int damageTaken;
+    private double damageRatio = this.damageDealt / this.damageTaken;
     private int matches;
-    private Date avgMatch;
+    private double avgMatch;
     private int wins;
     private int losses;
-    private double winLoss;
-    private int damageTaken;
-    private int damageDealt;
+    private double winLoss = this.wins / this.losses;
     private int kills;
     private int deaths;
+    private double killDeath = this.kills / this.deaths;
+}
+
+
+public ProfilePage(){}
+
+public ProfilePage(int rating, int score, int playtime, int damageTaken, int damageDealt, int matches, int wins, int losses, int kills, int deaths) {
+    this.rating = rating;
+    this.score = score;
+    this.playtime = playtime;
+    this.scoreMinute = this.score / this.playtime;
+    this.damageTaken = damageTaken;
+    this.damageDealt = damageDealt;
+    this.matches = matches;
+    this.wins = wins;
+    this.losses = losses;
+    this.kills = kills;
+    this.deaths = deaths;
 }
 
 
@@ -84,3 +101,58 @@ public void setAvgMatch(Date avgMatch) {
     this.avgMatch = avgMatch;
 }
 
+public int getWins() {
+    return this.wins;
+}
+
+public void setWins(int wins) {
+    this.wins = wins;
+}
+
+public int getLosses() {
+    return this.losses;
+}
+
+public void setLosses() {
+    this.losses = losses;
+}
+
+public double getWinLoss() {
+    return this.winLoss;
+}
+
+public void setWinLoss(double winLoss) {
+    this.winLoss = winLoss;
+}
+
+public int getDamageTaken() {
+    return this.damageTaken;
+}
+
+public void setDamageTaken(int damageTaken) {
+    this.damageTaken = damageTaken;
+}
+
+public int getDamageDealt() {
+    return this.getDamageDealt;
+}
+
+public void setDamageDealt(int damageDealt) {
+    this.damageDealt = damageDealt;
+}
+
+public int getKills() {
+    return this.kills;
+}
+
+public void setKills(int kills) {
+    this.kills = kills;
+}
+
+public int getDeaths() {
+    return this.deaths;
+}
+
+public void setDeaths(int deaths) {
+    this.deaths = deaths;
+}
