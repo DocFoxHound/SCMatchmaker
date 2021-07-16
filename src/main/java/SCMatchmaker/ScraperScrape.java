@@ -9,6 +9,7 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.support.ui.ExpectedConditions;
 import org.openqa.selenium.support.ui.WebDriverWait;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -70,7 +71,11 @@ public class ScraperScrape {
             String score = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div:nth-child(5)")).getText();
             String damageratio = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div:nth-child(6)")).getText();
             String killdeath = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div:nth-child(7)")).getText();
-            String playtime = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div:nth-child(8)")).getText();
+            //going to convert the play time into minutes, first.
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:SSS");
+            String timeString = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div:nth-child(8)")).getText();
+            String[] hourMin = timeString.split(":");
+            String playtime = String.valueOf((Integer.parseInt(hourMin[0])*60)+Integer.parseInt(hourMin[1]));
             //below are inside the expanded box. You have to remove some text before they can be stored.
             String matches = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div.stats-wrap.trans-05s.dogfighting.account.open > div:nth-child(1) > div.stats > li:nth-child(1)")).getText().replaceAll("MATCHES:", "");
             String avgmatch = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div.stats-wrap.trans-05s.dogfighting.account.open > div:nth-child(1) > div.stats > li:nth-child(2)")).getText().replaceAll("AVG MATCH:", "");

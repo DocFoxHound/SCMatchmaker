@@ -13,11 +13,9 @@ public class NewUser {
         //getting the user's Star Citizen profile URL
         String citizenURL = message.getContent().toString(); //gets the content of the user's post
 
-        //replace any spaces with nothing
-        citizenURL.replaceAll("\\s+","");
-
         //replace !newuser with nothing
         citizenURL = citizenURL.replaceAll("!newuser", ""); //removes the !newuser part of the string
+        citizenURL = citizenURL.replaceAll(" ", ""); //removes the !newuser part of the string
 
         //check that they actually put text/url after the command
         if(citizenURL.equals("")){
@@ -29,7 +27,7 @@ public class NewUser {
             List<String> userPage = CheckProfilePage.checkPage(citizenURL, message); //inputs a String and Message, outputs a string list.
 
             //if the userPage is empty then that means the verification process did not finish. Another error is also thrown.
-            if(userPage.size()==1){
+            if(userPage.size()==0){
                 Bot.sendMessage(message, "Error at Verifying User.");
             }
             else{//if userPage has data that means the check finished and the user was verified
@@ -74,7 +72,7 @@ public class NewUser {
                     preparedStmt.setDouble    (10, Double.parseDouble(leaderboard.get(4)));
                     preparedStmt.setInt    (11, Integer.parseInt(leaderboard.get(13)));
                     preparedStmt.setInt    (12, Integer.parseInt(leaderboard.get(14)));
-                    preparedStmt.setTime    (13, Time.valueOf(leaderboard.get(5)));
+                    preparedStmt.setInt    (13, Integer.parseInt(leaderboard.get(5)));
                     preparedStmt.setInt    (14, 10);
 
                     // execute the preparedstatement and cram it all in there

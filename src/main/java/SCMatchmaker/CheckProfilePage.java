@@ -9,7 +9,6 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Locale;
 
 //verifies that a userpage does, in fact, exist, and returns a list of some details
 public class CheckProfilePage {
@@ -26,22 +25,38 @@ public class CheckProfilePage {
         //initializing the wait driver (allows things to load) with maximum wait time in int
         WebDriverWait wait = new WebDriverWait(driver, 5);
 
-        //make sure URL is valid
-        boolean validURL;
-
         //place the results in an array list
         List<String> resultsArray = new ArrayList<>();
 
         //put it all in a try-catch
         try{
+            //validating the URL
+            boolean validURL;
+            if(url.startsWith("http")){
+                validURL = true;
+            }else{
+                validURL = false;
+            }
+
             //navigate to a website
             driver.navigate().to(url);
-            validURL = true;
 
             //checking if there's a 404 error and if the verified text is in the Bio
             Boolean isRealUser = driver.findElements(By.cssSelector("#public-profile > div.profile-content.overview-content.clearfix > p > span")).size() > 0;
 
-            if(validURL==true && isRealUser==true && driver.getPageSource().toLowerCase(Locale.ROOT).contains(message.getId().toString())){
+            //does the person's discordID appear on page?
+            //Boolean hasNumber = driver.getPageSource().toLowerCase(Locale.ROOT).contains(message.getId().toString());
+            Boolean hasNumber;
+            String userDiscordId = message.getUserData().id().toString();
+            String bioSection = driver.findElement(By.cssSelector("#public-profile > div.profile-content.overview-content.clearfix > div.right-col > div > div > div")).getText();
+            if (bioSection.contains(userDiscordId)){
+                hasNumber = true;
+            }else{
+                hasNumber = false;
+            }
+            //hasNumber = (driver.findElement(By.cssSelector("#public-profile > div.profile-content.overview-content.clearfix > div.right-col > div > div > div")).getText()==message.getUserData().id().toString());
+
+            if(validURL==true && isRealUser==true && hasNumber==true){
                 //get their handle
                 String handle = driver.findElement(By.cssSelector("#public-profile > div.profile-content.overview-content.clearfix > div.box-content.profile-wrapper.clearfix > div > div.profile.left-col > div > div.info > p:nth-child(2) > strong")).getText();
 
@@ -70,7 +85,6 @@ public class CheckProfilePage {
         }catch(Exception e){
             Bot.sendMessage(message, "The URL was invalid, please double-check and try again. It should look like the following:");
             Bot.sendMessage(message, "!newuser https://robertsspaceindustries.com/citizens/**YOUR_HANDLE_HERE**");
-            validURL = false;
 
             resultsArray.add("");
             return resultsArray;
