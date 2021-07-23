@@ -57,25 +57,30 @@ public class CheckProfilePage {
             //hasNumber = (driver.findElement(By.cssSelector("#public-profile > div.profile-content.overview-content.clearfix > div.right-col > div > div > div")).getText()==message.getUserData().id().toString());
 
             if(validURL==true && isRealUser==true && hasNumber==true){
-                //get their handle
-                String handle = driver.findElement(By.cssSelector("#public-profile > div.profile-content.overview-content.clearfix > div.box-content.profile-wrapper.clearfix > div > div.profile.left-col > div > div.info > p:nth-child(2) > strong")).getText();
-
                 //get their UEE record number
                 String ueeCitRecord = driver.findElement(By.cssSelector("#public-profile > div.profile-content.overview-content.clearfix > p > strong")).getText().replaceAll("#", "");; //it literally pulls the hashtag with it, so you gotta dump it.
 
-                //get their Org SID
-                String orgSID = driver.findElement(By.cssSelector("#public-profile > div.profile-content.overview-content.clearfix > div.box-content.profile-wrapper.clearfix > div > div.main-org.right-col.visibility-V > div > div.info > p:nth-child(2) > strong")).getText();
+                //check if the citrecord exists in the database. If it does, return an empty results array
+                if(SQLServices.existsUEENumber(ueeCitRecord, message) == true){
+                    return resultsArray;
+                }else{//if the citizenrecord doesn't exist, finish scraping and return the elements in an array
+                    //get their handle
+                    String handle = driver.findElement(By.cssSelector("#public-profile > div.profile-content.overview-content.clearfix > div.box-content.profile-wrapper.clearfix > div > div.profile.left-col > div > div.info > p:nth-child(2) > strong")).getText();
 
-                //update user and close driver
-                Bot.sendMessage(message, "Profile Page verified...");
-                driver.close();
+                    //get their Org SID
+                    String orgSID = driver.findElement(By.cssSelector("#public-profile > div.profile-content.overview-content.clearfix > div.box-content.profile-wrapper.clearfix > div > div.main-org.right-col.visibility-V > div > div.info > p:nth-child(2) > strong")).getText();
 
-                //place the results in an array list
-                resultsArray.add(handle); //index: 0
-                resultsArray.add(ueeCitRecord); //index: 1
-                resultsArray.add(orgSID); //index: 2
+                    //update user and close driver
+                    Bot.sendMessage(message, "Profile Page verified...");
+                    driver.close();
 
-                return resultsArray;
+                    //place the results in an array list
+                    resultsArray.add(handle); //index: 0
+                    resultsArray.add(ueeCitRecord); //index: 1
+                    resultsArray.add(orgSID); //index: 2
+
+                    return resultsArray;
+                }
             }else{
                 Bot.sendMessage(message, "There was an error, please check your URL and ensure the following text " +
                         "is located inside your StarCitizen Bio:");
