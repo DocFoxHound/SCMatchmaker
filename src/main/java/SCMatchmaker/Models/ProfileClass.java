@@ -6,41 +6,52 @@ public class ProfileClass {
     private Message message;
     private String citizenURL;
     private String discordID;
-    private String handle;
-    private int rating;
-    private int score;
-    private int playtime; //playtime recorded in terms of minutes
-    private int scoreMinute;
-    private int damageDealt;
-    private int damageTaken;
-    private double damageRatio = this.damageDealt / this.damageTaken;
-    private int matches;
-    private double avgMatch;
-    private int wins;
-    private int losses;
-    private double winLoss = this.wins / this.losses;
-    private int kills;
-    private int deaths;
-    private double killDeath = this.kills / this.deaths;
+    private String handle; //db
+    private String ueeCitizenRecord; //db
+    private String discordUsername = message.getUserData().username(); //db
+    private String orgID; //db
+    private double ELO; //db
+    private int rating; //db
+    private long score; //db
+    private int playtime; //db
+    private double scoreMinute; //db
+    private long damageDealt; //db
+    private long damageTaken; //db
+    private double damageRatio; //db
+    private int matches; //db
+    private double avgMatch; //db
+    private int wins; //db
+    private int losses; //db
+    private double winLoss; //db
+    private int kills; //db
+    private int deaths; //db
+    private double killDeath; //db
 
     public ProfileClass(){}
 
-    public ProfileClass(Message message, String citizenURL, String discordID, String handle, int rating, int score, int playtime, int damageTaken, int damageDealt, int matches, int wins, int losses, int kills, int deaths) {
+    public ProfileClass(double ELO, double damageRatio, double scoreMinute, Message message, String citizenURL, String discordID, String handle, String ueeCitizenRecord, String discordUsername, String orgID, int rating, long score, int playtime, long damageTaken, long damageDealt, int matches, int wins, int losses, double winLoss, int kills, int deaths, double killDeath) {
         this.message = message;
         this.citizenURL = citizenURL;
         this.discordID = discordID;
         this.handle = handle;
+        this.ueeCitizenRecord = ueeCitizenRecord;
+        this.discordUsername = discordUsername;
+        this.orgID = orgID;
+        this.ELO = ELO;
         this.rating = rating;
         this.score = score;
         this.playtime = playtime;
-        this.scoreMinute = this.score / this.playtime;
+        this.scoreMinute = scoreMinute;
         this.damageTaken = damageTaken;
         this.damageDealt = damageDealt;
+        this.damageRatio = damageRatio;
         this.matches = matches;
         this.wins = wins;
         this.losses = losses;
+        this.winLoss = winLoss;
         this.kills = kills;
         this.deaths = deaths;
+        this.killDeath = killDeath;
     }
 
     //-----------------------------------------------------------------
@@ -61,15 +72,31 @@ public class ProfileClass {
         return this.handle;
     }
 
+    public String getUeeCitizenRecord(){
+        return this.ueeCitizenRecord;
+    }
+
+    public String getDiscordUsername(){
+        return this.discordUsername;
+    }
+
+    public String getOrgID(){
+        return this.orgID;
+    }
+
+    public double getELO(){
+        return this.ELO;
+    }
+
     public int getRating(){
         return this.rating;
     }
 
-    public int getScoreMinute(){
+    public double getScoreMinute(){
         return this.scoreMinute;
     }
 
-    public int getScore() {
+    public long getScore() {
         return this.score;
     }
 
@@ -105,11 +132,11 @@ public class ProfileClass {
         return this.winLoss;
     }
 
-    public int getDamageTaken() {
+    public long getDamageTaken() {
         return this.damageTaken;
     }
 
-    public int getDamageDealt() {
+    public long getDamageDealt() {
         return this.damageDealt;
     }
 
@@ -139,15 +166,31 @@ public class ProfileClass {
         this.handle = newHandle;
     }
 
+    public void setUeeCitizenRecord(String newUeeCitizenRecord){
+        this.ueeCitizenRecord = newUeeCitizenRecord;
+    }
+
+    public void setDiscordUsername(String newDiscordUsername){
+        this.discordUsername = newDiscordUsername;
+    }
+
+    public void setOrgID(String newOrgID){
+        this.orgID = newOrgID;
+    }
+
+    public void setELO(Double newELO){
+        this.ELO = newELO;
+    }
+
     public void setRating(int rating){
         this.rating = rating;
     }
 
-    public void setScoreMinute(int scoreMinute) {
+    public void setScoreMinute(double scoreMinute) {
         this.scoreMinute = scoreMinute;
     }
 
-    public void setScore(int score) {
+    public void setScore(long score) {
         this.score = score;
     }
 
@@ -183,11 +226,11 @@ public class ProfileClass {
         this.winLoss = winLoss;
     }
 
-    public void setDamageTaken(int damageTaken) {
+    public void setDamageTaken(long damageTaken) {
         this.damageTaken = damageTaken;
     }
 
-    public void setDamageDealt(int damageDealt) {
+    public void setDamageDealt(long damageDealt) {
         this.damageDealt = damageDealt;
     }
 

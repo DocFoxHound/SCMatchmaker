@@ -12,6 +12,9 @@ public class NewUser {
         //make a new profileclass object
         ProfileClass user = new ProfileClass();
 
+        //assign the discordID
+        user.setDiscordID(message.getUserData().id().toString());
+
         //Get the userID of who is calling the command
         //String userDiscordID = message.getUserData().id().toString();
         user.setDiscordID(message.getUserData().id().toString()); //using the profileclass in parallel while testing
@@ -48,7 +51,29 @@ public class NewUser {
 
                     //loading the user object
                     user.setHandle(userPage.get(0));
-                    //TODO more loading
+                    user.setUeeCitizenRecord(userPage.get(1));
+                    //user.setDiscordUsername(); //already set in the constructor
+                    user.setOrgID(userPage.get(2));
+                    user.setRating(Integer.parseInt(leaderboard.get(0)));
+                    user.setScoreMinute(Double.parseDouble(leaderboard.get(1)));
+                    user.setScore(Long.parseLong(leaderboard.get(2)));
+                    user.setDamageRatio(Double.parseDouble(leaderboard.get(3)));
+                    user.setKillDeath(Double.parseDouble(leaderboard.get(4)));
+                    user.setKills(Integer.parseInt(leaderboard.get(13)));
+                    user.setDeaths(Integer.parseInt(leaderboard.get(14)));
+                    user.setPlaytime(Integer.parseInt(leaderboard.get(5)));
+                    //user.setELO(10.00); //we need an equation for ELO
+                    user.setDamageDealt(Long.parseLong(leaderboard.get(12)));
+                    user.setDamageTaken(Long.parseLong(leaderboard.get(11)));
+                    user.setMatches(Integer.parseInt(leaderboard.get(6)));
+                    user.setAvgMatch(Double.parseDouble(leaderboard.get(7)));
+                    user.setWins(Integer.parseInt(leaderboard.get(8)));
+                    user.setLosses((Integer.parseInt(leaderboard.get(9))));
+                    user.setWinLoss(Double.parseDouble(leaderboard.get(10)));
+
+                    //remove lists
+                    leaderboard = null;
+                    userPage = null;
 
                     //get date data
                     LocalDateTime now = LocalDateTime.now();
@@ -63,40 +88,54 @@ public class NewUser {
 
                         //the SQL query. this, essentially, tells the Database what it's going to be inserting.
                         String query = " INSERT INTO ACBattleRoyal (" +
-                                "schandle, " + //1
-                                "ueecitizenrecord, " + //2
-                                "discordusername, " + //3
-                                "discordid," + //4
-                                "scorgsid, " + //5
-                                "rating,  " + //6
-                                "scoreperminute, " + //7
-                                "score, " + //8
-                                "damageratio, " + //9
-                                "killdeath, " + //10
-                                "kills, " + //11
-                                "deaths, " + //12
-                                "playtime, " + //13
-                                "elo," + //14
-                                "lastupdated)" //15
-                                + " values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"; //its similar but different from other DB languages
+                                "discordid," + //1
+                                "schandle," + //2
+                                "ueecitizenrecord," + //3
+                                "discordusername," + //4
+                                "scorgsid," + //5
+                                "elo," + //6
+                                "rating," + //7
+                                "score," + //8
+                                "playtime," + //9
+                                "scoreperminute," + //10
+                                "damagedealt," + //11
+                                "damagetaken," + //12
+                                "damageratio," + //13
+                                "matches," + //14
+                                "avgmatch," + //15
+                                "wins," + //16
+                                "losses," + //17
+                                "winloss," + //18
+                                "kills," + //19
+                                "deaths," + //20
+                                "killdeath," + //21
+                                "lastupdated)" //22
+                                + " values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"; //its similar but different from other DB languages
 
                         // create the mysql insert preparedstatement and assign all the appropriate values from my two lists (userPage and leaderboard) into the database
                         PreparedStatement preparedStmt = conn.prepareStatement(query);
-                        preparedStmt.setString (1, userPage.get(0));
-                        preparedStmt.setInt (2, Integer.parseInt(userPage.get(1)));
-                        preparedStmt.setString   (3, message.getUserData().username());
-                        preparedStmt.setLong   (4, Long.parseLong(message.getUserData().id().toString()));
-                        preparedStmt.setString    (5, userPage.get(2));
-                        preparedStmt.setInt    (6, Integer.parseInt(leaderboard.get(0)));
-                        preparedStmt.setDouble    (7, Double.parseDouble(leaderboard.get(1)));
-                        preparedStmt.setLong    (8, Long.parseLong(leaderboard.get(2)));
-                        preparedStmt.setDouble    (9, Double.parseDouble(leaderboard.get(3)));
-                        preparedStmt.setDouble    (10, Double.parseDouble(leaderboard.get(4)));
-                        preparedStmt.setInt    (11, Integer.parseInt(leaderboard.get(13)));
-                        preparedStmt.setInt    (12, Integer.parseInt(leaderboard.get(14)));
-                        preparedStmt.setInt    (13, Integer.parseInt(leaderboard.get(5)));
-                        preparedStmt.setInt    (14, 10);
-                        preparedStmt.setTimestamp    (15, sqlNow);
+                        preparedStmt.setLong(1, Long.parseLong(user.getDiscordID()));
+                        preparedStmt.setString(2, user.getHandle());
+                        preparedStmt.setInt(3, Integer.parseInt(user.getUeeCitizenRecord()));
+                        preparedStmt.setString(4, user.getDiscordUsername());
+                        preparedStmt.setString(5, user.getOrgID());
+                        preparedStmt.setDouble(6, user.getELO());
+                        preparedStmt.setInt(7, user.getRating());
+                        preparedStmt.setLong(8, user.getScore());
+                        preparedStmt.setInt(9, user.getPlaytime());
+                        preparedStmt.setDouble(10, user.getScoreMinute());
+                        preparedStmt.setLong(11, user.getDamageDealt());
+                        preparedStmt.setLong(12, user.getDamageTaken());
+                        preparedStmt.setDouble(13, user.getDamageRatio());
+                        preparedStmt.setInt(14, user.getMatches());
+                        preparedStmt.setDouble(15, user.getAvgMatch());
+                        preparedStmt.setInt(16, user.getWins());
+                        preparedStmt.setInt(17, user.getLosses());
+                        preparedStmt.setDouble(18, user.getWinLoss());
+                        preparedStmt.setInt(19, user.getKills());
+                        preparedStmt.setInt(20, user.getKills());
+                        preparedStmt.setDouble(21, user.getKillDeath());
+                        preparedStmt.setTimestamp    (15, sqlNow); //lastupdated
 
                         // execute the preparedstatement and cram it all in there
                         preparedStmt.execute();
@@ -104,12 +143,6 @@ public class NewUser {
                         //tell the user what just happened and close the connection
                         Bot.sendMessage(message, "User added to database.");
                         conn.close();
-
-                        //cleanup, though I don't think its needed since Java handles it by itself
-                        leaderboard = null;
-                        userPage = null;
-                        message = null;
-
                     } catch (SQLException e) { //here we catch the errors
                         //if the error is a duplicate error, let the user know what to do next
                         if(e.toString().contains("Duplicate entry")){
