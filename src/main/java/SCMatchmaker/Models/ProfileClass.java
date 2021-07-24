@@ -8,7 +8,7 @@ public class ProfileClass {
     private String discordID;
     private String handle; //db
     private String ueeCitizenRecord; //db
-    private String discordUsername = message.getUserData().username(); //db
+    private String discordUsername; //db
     private String orgID; //db
     private double ELO; //db
     private int rating; //db
@@ -19,7 +19,7 @@ public class ProfileClass {
     private long damageTaken; //db
     private double damageRatio; //db
     private int matches; //db
-    private double avgMatch; //db
+    private int avgMatch; //db
     private int wins; //db
     private int losses; //db
     private double winLoss; //db
@@ -29,7 +29,29 @@ public class ProfileClass {
 
     public ProfileClass(){}
 
-    public ProfileClass(double ELO, double damageRatio, double scoreMinute, Message message, String citizenURL, String discordID, String handle, String ueeCitizenRecord, String discordUsername, String orgID, int rating, long score, int playtime, long damageTaken, long damageDealt, int matches, int wins, int losses, double winLoss, int kills, int deaths, double killDeath) {
+    public ProfileClass(Message message,
+                        String citizenURL,
+                        String discordID,
+                        String handle,
+                        String ueeCitizenRecord,
+                        String discordUsername,
+                        String orgID,
+                        double ELO,
+                        int rating,
+                        long score,
+                        int playtime,
+                        double scoreMinute,
+                        long damageDealt,
+                        long damageTaken,
+                        double damageRatio,
+                        int matches,
+                        int avgMatch,
+                        int wins,
+                        int losses,
+                        double winLoss,
+                        int kills,
+                        int deaths,
+                        double killDeath) {
         this.message = message;
         this.citizenURL = citizenURL;
         this.discordID = discordID;
@@ -116,7 +138,7 @@ public class ProfileClass {
         return matches;
     }
 
-    public double getAvgMatch() {
+    public int getAvgMatch() {
         return this.avgMatch;
     }
 
@@ -210,7 +232,7 @@ public class ProfileClass {
         this.matches = matches;
     }
 
-    public void setAvgMatch(double newAvgMatch) {
+    public void setAvgMatch(int newAvgMatch) {
         this.avgMatch = newAvgMatch;
     }
 

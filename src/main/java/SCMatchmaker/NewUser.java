@@ -12,23 +12,23 @@ public class NewUser {
         //make a new profileclass object
         ProfileClass user = new ProfileClass();
 
+        //set the message in the user object
+        user.setMessage(message);
+        message = null;
+
         //assign the discordID
-        user.setDiscordID(message.getUserData().id().toString());
+        user.setDiscordID(user.getMessage().getUserData().id().toString());
 
         //Get the userID of who is calling the command
         //String userDiscordID = message.getUserData().id().toString();
-        user.setDiscordID(message.getUserData().id().toString()); //using the profileclass in parallel while testing
+        user.setDiscordID(user.getMessage().getUserData().id().toString()); //using the profileclass in parallel while testing
 
         //getting the text of the user's command
-        user.setCitizenURL(message.getContent().toString());
+        user.setCitizenURL(user.getMessage().getContent().toString());
 
         //replace !newuser with nothing, leaving only the URL
         user.setCitizenURL(user.getCitizenURL().replaceAll("!newuser", "")); //removes the !newuser part of the string
         user.setCitizenURL(user.getCitizenURL().replaceAll(" ", ""));//removes the !newuser part of the string
-
-        //set the message in the user object
-        user.setMessage(message);
-        message = null; //erase the previous message
 
         //check that they actually put text/url after the command
         if(user.getCitizenURL().equals("")){
@@ -52,7 +52,7 @@ public class NewUser {
                     //loading the user object
                     user.setHandle(userPage.get(0));
                     user.setUeeCitizenRecord(userPage.get(1));
-                    //user.setDiscordUsername(); //already set in the constructor
+                    user.setDiscordUsername(user.getMessage().getUserData().username());
                     user.setOrgID(userPage.get(2));
                     user.setRating(Integer.parseInt(leaderboard.get(0)));
                     user.setScoreMinute(Double.parseDouble(leaderboard.get(1)));
@@ -66,7 +66,7 @@ public class NewUser {
                     user.setDamageDealt(Long.parseLong(leaderboard.get(12)));
                     user.setDamageTaken(Long.parseLong(leaderboard.get(11)));
                     user.setMatches(Integer.parseInt(leaderboard.get(6)));
-                    user.setAvgMatch(Double.parseDouble(leaderboard.get(7)));
+                    user.setAvgMatch(Integer.parseInt(leaderboard.get(7)));
                     user.setWins(Integer.parseInt(leaderboard.get(8)));
                     user.setLosses((Integer.parseInt(leaderboard.get(9))));
                     user.setWinLoss(Double.parseDouble(leaderboard.get(10)));
@@ -135,24 +135,24 @@ public class NewUser {
                         preparedStmt.setInt(19, user.getKills());
                         preparedStmt.setInt(20, user.getKills());
                         preparedStmt.setDouble(21, user.getKillDeath());
-                        preparedStmt.setTimestamp    (15, sqlNow); //lastupdated
+                        preparedStmt.setTimestamp    (22, sqlNow); //lastupdated
 
                         // execute the preparedstatement and cram it all in there
                         preparedStmt.execute();
 
                         //tell the user what just happened and close the connection
-                        Bot.sendMessage(message, "User added to database.");
+                        Bot.sendMessage(user.getMessage(), "User added to database.");
                         conn.close();
                     } catch (SQLException e) { //here we catch the errors
                         //if the error is a duplicate error, let the user know what to do next
                         if(e.toString().contains("Duplicate entry")){
-                            Bot.sendMessage(message, "This Star Citizen account already exists in the database! " +
+                            Bot.sendMessage(user.getMessage(), "This Star Citizen account already exists in the database! " +
                                     "If you need to update your Discord and Star Citizen accounts, please use the " +
                                     "!updateme command like this:" +
                                     "!updateme https://robertsspaceindustries.com/citizens/**YOUR_HANDLE_HERE**");
                         }else{ //all other errors just spit it out into discord
                             //if the connection fails send this message
-                            Bot.sendMessage(message, "//SQL Error: " + e);
+                            Bot.sendMessage(user.getMessage(), "//SQL Error: " + e);
                         }
                     }
                 }
