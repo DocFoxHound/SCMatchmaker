@@ -33,7 +33,8 @@ public class CommandService {
                 return;
             }
             else if(command.startsWith("newuser")){
-                Bot.sendMessage(message, "Verifying Profile Page...");
+                Bot.sendMessage(message, "**ADDING NEW USER**" +
+                        "\nPlease wait...");
                 NewUser.newUser(message);
                 return;
             }
