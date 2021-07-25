@@ -334,4 +334,36 @@ public class SQLServices {
             }
         }
     }
+
+    //TODO remove user from databases
+    public static String removeUser(String ueeCitNum){
+        try{
+            //connection string
+            String connectionUrl = "jdbc:mysql://na01-sql.pebblehost.com:3306/customer_203228_users";
+            Connection conn = DriverManager.getConnection(connectionUrl, "customer_203228_users", "PRoA@fS6TXRhBn0QXWYy");
+
+            String deleteBR = "DELETE FROM ACBattleRoyal where ueecitizenrecord = ?";
+            PreparedStatement preparedStmt = conn.prepareStatement(deleteBR);
+            preparedStmt.setInt(1, Integer.parseInt(ueeCitNum));
+            preparedStmt.execute();
+
+            String deleteSB = "DELETE FROM ACSquadronBattle where ueecitizenrecord = ?";
+            PreparedStatement preparedStmt2 = conn.prepareStatement(deleteSB);
+            preparedStmt2.setInt(1, Integer.parseInt(ueeCitNum));
+            preparedStmt2.execute();
+
+            /*
+            String deleteD = "DELETE FROM ACDuel where ueecitizenrecord = ?";
+            PreparedStatement preparedStmt3 = conn.prepareStatement(deleteD);
+            preparedStmt3.setInt(1, Integer.parseInt(ueeCitNum));
+            preparedStmt3.execute();
+
+             */
+
+            conn.close();
+            return ":small_blue_diamond: Database cleared of user record, repopulating...";
+        }catch(SQLException e){
+            return ":small_red_diamond: There was an error removing the user from the database: " + e;
+        }
+    }
 }

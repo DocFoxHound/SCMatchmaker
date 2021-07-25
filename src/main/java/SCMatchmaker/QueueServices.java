@@ -5,7 +5,7 @@ import discord4j.core.object.entity.Message;
 import java.sql.*;
 
 //This is the queue method, which will handle a lot of stuff.
-public class QueueService {
+public class QueueServices {
     public static void queuing(Message message){
 
         //Get the userID of who is calling the command

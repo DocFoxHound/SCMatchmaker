@@ -1,6 +1,9 @@
-package SCMatchmaker;
+package SCMatchmaker.Commands;
 
+import SCMatchmaker.Bot;
 import SCMatchmaker.Models.ProfileClass;
+import SCMatchmaker.SQLServices;
+import SCMatchmaker.ScraperServices;
 import discord4j.core.object.entity.Message;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -51,7 +54,7 @@ public class NewUser {
             //check DataBase for DiscordID
             if (SQLServices.existsDiscordID(user.getDiscordID(), user.getMessage()) == false) { //if the DiscordID doesn't exist, continue adding user
                 //this checks if the user exists and returns their handle
-                List<String> userPage = ScraperScrape.checkPage(user.getCitizenURL(), user.getMessage(), driver, wait); //inputs a String and Message, outputs a string list
+                List<String> userPage = ScraperServices.checkPageNewUser(user.getCitizenURL(), user.getMessage(), driver, wait); //inputs a String and Message, outputs a string list
 
                 //if the userPage is empty then that means the verification process did not finish. Another error is also thrown.
                 if(userPage.size()==0){
@@ -65,8 +68,8 @@ public class NewUser {
                     user.setHandle(userPage.get(0));
 
                     //this scrapes the leaderboard into a List of Strings. Inputs Message and a String (Star Citizen Handle)
-                    List<String> BR_leaderboard = ScraperScrape.scrapeBattleRoyal(user.getMessage(), user.getHandle(), driver, wait);
-                    List<String> SB_leaderboard = ScraperScrape.scrapeSquadronBattle(user.getMessage(), user.getHandle(), driver, wait);
+                    List<String> BR_leaderboard = ScraperServices.scrapeBattleRoyal(user.getMessage(), user.getHandle(), driver, wait);
+                    List<String> SB_leaderboard = ScraperServices.scrapeSquadronBattle(user.getMessage(), user.getHandle(), driver, wait);
                     //List<String> D_leaderboard = ScraperScrape.scrapeDuel(user.getMessage(), user.getHandle());
 
                     //close the browser

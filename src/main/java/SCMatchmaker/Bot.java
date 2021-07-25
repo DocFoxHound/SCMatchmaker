@@ -46,7 +46,7 @@ public class Bot {
                     //server, the message content, and the sender, which can all be useful when
                     //processing commands
                     Message message = event.getMessage();
-                    CommandService.onMessage(message); //this is the method we're sending the message to.
+                    CommandServices.onMessage(message); //this is the method we're sending the message to.
                 });
         //prevents disconnect. I hear if I have a daemon thread running I wont need to use this,
         //but I'm not sure how to do that. Also I may need to use .subscribe on login if I wanted

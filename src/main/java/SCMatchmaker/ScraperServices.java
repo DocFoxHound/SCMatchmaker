@@ -12,7 +12,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 
-public class ScraperScrape {
+public class ScraperServices {
     //scrapes the battle royal leaderboard
     public static List<String> scrapeBattleRoyal(Message message, String handle, WebDriver driver, WebDriverWait wait){
         //setting up the return list
@@ -226,7 +226,7 @@ public class ScraperScrape {
     }
 
     //check profile page
-    public static List<String> checkPage(String url, Message message, WebDriver driver, WebDriverWait wait) {
+    public static List<String> checkPageNewUser(String url, Message message, WebDriver driver, WebDriverWait wait) {
 
         //place the results in an array list
         List<String> resultsArray = new ArrayList<>();
@@ -291,7 +291,73 @@ public class ScraperScrape {
             }
         }catch(Exception e){
             Bot.sendMessage(message, ":small_red_triangle: The URL was invalid, please double-check and try again. It should look like the following:" +
-                    "\n!newuser https://robertsspaceindustries.com/citizens/**YOUR_HANDLE_HERE**");
+                    "\n`` !newuser https://robertsspaceindustries.com/citizens/YOUR_HANDLE_HERE ``");
+            return resultsArray;
+        }
+    }
+
+    //check profile page
+    public static List<String> checkPageUpdateMe(String url, Message message, WebDriver driver, WebDriverWait wait) {
+
+        //place the results in an array list
+        List<String> resultsArray = new ArrayList<>();
+
+        //put it all in a try-catch
+        try{
+            //validating the URL
+            boolean validURL;
+            if(url.startsWith("http")){
+                validURL = true;
+            }else{
+                validURL = false;
+            }
+
+            //navigate to a website
+            driver.navigate().to(url);
+
+            //checking if there's a 404 error and if the verified text is in the Bio
+            Boolean isRealUser = driver.findElements(By.cssSelector("#public-profile > div.profile-content.overview-content.clearfix > p > span")).size() > 0;
+
+            //does the person's discordID appear on page?
+            //Boolean hasNumber = driver.getPageSource().toLowerCase(Locale.ROOT).contains(message.getId().toString());
+            Boolean hasNumber;
+            String userDiscordId = message.getUserData().id().toString();
+            String bioSection = driver.findElement(By.cssSelector("#public-profile > div.profile-content.overview-content.clearfix > div.right-col > div > div > div")).getText();
+            if (bioSection.contains(userDiscordId)){
+                hasNumber = true;
+            }else{
+                hasNumber = false;
+            }
+            //hasNumber = (driver.findElement(By.cssSelector("#public-profile > div.profile-content.overview-content.clearfix > div.right-col > div > div > div")).getText()==message.getUserData().id().toString());
+
+            if(validURL==true && isRealUser==true && hasNumber==true){
+                //get their UEE record number
+                String ueeCitRecord = driver.findElement(By.cssSelector("#public-profile > div.profile-content.overview-content.clearfix > p > strong")).getText().replaceAll("#", "");; //it literally pulls the hashtag with it, so you gotta dump it.
+
+                //get their handle
+                String handle = driver.findElement(By.cssSelector("#public-profile > div.profile-content.overview-content.clearfix > div.box-content.profile-wrapper.clearfix > div > div.profile.left-col > div > div.info > p:nth-child(2) > strong")).getText();
+
+                //get their Org SID
+                String orgSID = driver.findElement(By.cssSelector("#public-profile > div.profile-content.overview-content.clearfix > div.box-content.profile-wrapper.clearfix > div > div.main-org.right-col.visibility-V > div > div.info > p:nth-child(2) > strong")).getText();
+
+                //update user and close driver
+                Bot.sendMessage(message, ":small_blue_diamond: (1/5) Profile Page verified...");
+
+                //place the results in an array list
+                resultsArray.add(handle); //index: 0
+                resultsArray.add(ueeCitRecord); //index: 1
+                resultsArray.add(orgSID); //index: 2
+
+                return resultsArray;
+            }else{
+                Bot.sendMessage(message, ":small_red_triangle: There was an error, please check your URL and ensure the following text " +
+                        "is located inside your StarCitizen Bio:");
+                Bot.sendMessage(message, message.getUserData().id().toString());
+                return resultsArray;
+            }
+        }catch(Exception e){
+            Bot.sendMessage(message, ":small_red_triangle: The URL was invalid, please double-check and try again. It should look like the following:" +
+                    "\n`` !newuser https://robertsspaceindustries.com/citizens/YOUR_HANDLE_HERE ``");
             return resultsArray;
         }
     }

@@ -1,11 +1,13 @@
 package SCMatchmaker;
 
+import SCMatchmaker.Commands.NewUser;
+import SCMatchmaker.Commands.UpdateMe;
 import discord4j.core.object.entity.Message;
 
 import java.util.Locale;
 
 
-public class CommandService {
+public class CommandServices {
     public static void onMessage(Message message){
         //if the message (passed onto this method from Bot.java) starts with cmdChar(also passed from Bot.java),
         //then we do commands and stuff.
@@ -29,7 +31,7 @@ public class CommandService {
             //here we are recognizing the queue command and passing off the message data to another method to handle.
             else if(command.startsWith("queue")){
                 Bot.sendMessage(message, "//The queue command is currently unfinished.");
-                QueueService.queuing(message);
+                QueueServices.queuing(message);
                 return;
             }
             else if(command.startsWith("newuser")){
@@ -39,7 +41,9 @@ public class CommandService {
                 return;
             }
             else if(command.startsWith("updateme")){
-                Bot.sendMessage(message, "The updateme command is still in the works.");
+                Bot.sendMessage(message, "**UPDATING USER**" +
+                        "\nPease wait...");
+                UpdateMe.UpdateMe(message);
                 return;
             }
             else{
