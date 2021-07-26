@@ -5,6 +5,7 @@ import discord4j.core.object.entity.Message;
 
 import java.sql.*;
 import java.time.LocalDateTime;
+import java.util.List;
 
 import static java.lang.Integer.parseInt;
 
@@ -335,7 +336,7 @@ public class SQLServices {
         }
     }
 
-    //TODO remove user from databases
+    //remove a user from all databases
     public static String removeUser(String ueeCitNum){
         try{
             //connection string
@@ -364,6 +365,48 @@ public class SQLServices {
             return ":small_blue_diamond: Database cleared of user record, repopulating...";
         }catch(SQLException e){
             return ":small_red_diamond: There was an error removing the user from the database: " + e;
+        }
+    }
+
+    //get BattleRoyal
+    public static List<String> getBattleRoyal(String discordID){
+        //the list we need to return
+        List<String> results = null;
+
+        //connection string and connection initiation
+        Connection conn = null;
+        try{
+            String connectionUrl = "jdbc:mysql://na01-sql.pebblehost.com:3306/customer_203228_users";
+            conn = DriverManager.getConnection(connectionUrl, "customer_203228_users", "PRoA@fS6TXRhBn0QXWYy");
+
+            //the SQL query to get the whole database by DiscordID
+            String Query = "SELECT schandle, elo FROM ACBattleRoyal WHERE discordid = " + discordID;
+
+            //create the java statement that we'll save this as
+            Statement st = conn.createStatement();
+
+            //execute query and get a java resultset
+            ResultSet rs = st.executeQuery(Query);
+
+            //rotate next?
+            rs.next();
+
+            String handle = rs.getString(1);
+            String elo = rs.getString(2);
+
+            //add the SCHandle
+            results.add(handle);
+
+
+            //add the ELO
+            results.add(elo);
+
+            //return the list
+            return results;
+
+        }catch(SQLException e){
+            results.add(e.toString());
+            return results;
         }
     }
 }

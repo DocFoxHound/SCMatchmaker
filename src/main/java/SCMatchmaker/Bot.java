@@ -1,5 +1,6 @@
 package SCMatchmaker;
 
+import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.lifecycle.ReadyEvent;
@@ -46,6 +47,7 @@ public class Bot {
                     //server, the message content, and the sender, which can all be useful when
                     //processing commands
                     Message message = event.getMessage();
+                    Long guildID = Long.parseLong(event.getGuildId().toString());
                     CommandServices.onMessage(message); //this is the method we're sending the message to.
                 });
         //prevents disconnect. I hear if I have a daemon thread running I wont need to use this,
@@ -65,6 +67,13 @@ public class Bot {
     //but it is shorter than typing it all out. the Return block shows the full way to send a message, just replace
     //text with "strings go here" to send a message yourself.
     public static Message sendMessage(Message message, String text){
+        return (message.getChannel().block().createMessage(text).block());
+    }
+
+    public static Message sendMessageTest(Message message, String text){
+        Snowflake channelId = message.getChannelId();
+        String messageString = message.toString();
+        //Message newMessage = ;
         return (message.getChannel().block().createMessage(text).block());
     }
 }

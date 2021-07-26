@@ -1,6 +1,7 @@
 package SCMatchmaker;
 
 import SCMatchmaker.Commands.NewUser;
+import SCMatchmaker.Commands.QueueBR;
 import SCMatchmaker.Commands.UpdateMe;
 import discord4j.core.object.entity.Message;
 
@@ -16,12 +17,10 @@ public class CommandServices {
             String command = message.getContent().toString().substring(1);
 
             //recognizes a command and then does something with it.
-            if (command.startsWith("test")){
-                Bot.sendMessage(message, "Bed!");
-                return;
-            }
-            else if(command.startsWith("ping")){
-                Bot.sendMessage(message, "Pong!");
+            if (command.startsWith("ping")){
+                String channel = message.getChannelId().toString();
+                String guild = message.getGuildId().toString();
+                Bot.sendMessage(message, "Pong: " + guild + " : " + channel);
                 return;
             }
             else if(command.startsWith("help")){
@@ -29,9 +28,9 @@ public class CommandServices {
                 return;
             }
             //here we are recognizing the queue command and passing off the message data to another method to handle.
-            else if(command.startsWith("queue")){
-                Bot.sendMessage(message, "//The queue command is currently unfinished.");
-                QueueServices.queuing(message);
+            else if(command.startsWith("queue_br")){
+                Bot.sendMessage(message, "Queueing for Battle Royal...");
+                QueueBR.queuing(message);
                 return;
             }
             else if(command.startsWith("newuser")){
@@ -47,7 +46,6 @@ public class CommandServices {
                 return;
             }
             else{
-                Bot.sendMessage(message, "Command unrecognized.");
                 return;
             }
         }
