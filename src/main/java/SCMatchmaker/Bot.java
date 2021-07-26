@@ -47,7 +47,6 @@ public class Bot {
                     //server, the message content, and the sender, which can all be useful when
                     //processing commands
                     Message message = event.getMessage();
-                    Long guildID = Long.parseLong(event.getGuildId().toString());
                     CommandServices.onMessage(message); //this is the method we're sending the message to.
                 });
         //prevents disconnect. I hear if I have a daemon thread running I wont need to use this,

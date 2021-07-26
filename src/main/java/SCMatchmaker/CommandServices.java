@@ -18,9 +18,7 @@ public class CommandServices {
 
             //recognizes a command and then does something with it.
             if (command.startsWith("ping")){
-                String channel = message.getChannelId().toString();
-                String guild = message.getGuildId().toString();
-                Bot.sendMessage(message, "Pong: " + guild + " : " + channel);
+                Bot.sendMessage(message, "Pong!");
                 return;
             }
             else if(command.startsWith("help")){
