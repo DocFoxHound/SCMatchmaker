@@ -1,5 +1,6 @@
 package SCMatchmaker;
 
+import SCMatchmaker.Models.PartyClass;
 import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.GatewayDiscordClient;
@@ -8,7 +9,11 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 
+import java.util.List;
+
 public class Bot {
+    //create the list of BR matchmaking parties
+    List<PartyClass> BRparties;
 
     //Execute command??
     public interface Command {

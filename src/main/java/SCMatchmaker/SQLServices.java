@@ -380,7 +380,7 @@ public class SQLServices {
             conn = DriverManager.getConnection(connectionUrl, "customer_203228_users", "PRoA@fS6TXRhBn0QXWYy");
 
             //the SQL query to get the whole database by DiscordID
-            String Query = "SELECT schandle, elo FROM ACBattleRoyal WHERE discordid = " + discordID;
+            String Query = "SELECT schandle, rating FROM ACBattleRoyal WHERE discordid = " + discordID;
 
             //create the java statement that we'll save this as
             Statement st = conn.createStatement();
