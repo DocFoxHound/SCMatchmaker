@@ -14,6 +14,7 @@ public class QueueBR {
         //make the player
         PlayerClass player = new PlayerClass();
         player.setDiscordID(message.getUserData().id().toString());
+        player.setMessage(message);
 
         //match it with the database and get the handle, ELO
         List<String> userInfo = SQLServices.getBattleRoyal(player.getDiscordID());
@@ -30,6 +31,7 @@ public class QueueBR {
 
             //tell whats going on
             Bot.sendMessage(message, "Profile acquired, entering Battle Royal queue...");
+            message.delete(); //delete the message
 
             //insert player into BRqueue
             QueueServices.BRqueue(player);

@@ -13,7 +13,7 @@ import java.util.List;
 
 public class Bot {
     //create the list of BR matchmaking parties
-    List<PartyClass> BRparties;
+    public static List<PartyClass> BRparties;
 
     //Execute command??
     public interface Command {
@@ -80,4 +80,5 @@ public class Bot {
         //Message newMessage = ;
         return (message.getChannel().block().createMessage(text).block());
     }
+
 }
