@@ -1,6 +1,7 @@
 package SCMatchmaker.Commands;
 
 import SCMatchmaker.Bot;
+import SCMatchmaker.Models.PartyClass;
 import SCMatchmaker.Models.PlayerClass;
 import SCMatchmaker.QueueServices;
 import SCMatchmaker.SQLServices;
@@ -29,12 +30,33 @@ public class QueueBR {
             player.setElo(Double.parseDouble(userInfo.get(1))); //elo
             userInfo.clear(); //clear the list
 
-            //tell whats going on
-            Bot.sendMessage(message, "Profile acquired, entering Battle Royal queue...");
             message.delete(); //delete the message
 
-            //insert player into BRqueue
-            QueueServices.BRqueue(player);
+            //a boolean to help me figure out if a player exists because I can't think of a better way to do it rn
+            boolean playerExists = false;
+
+            //make sure player isn't already in a list
+            for(PartyClass party : Bot.BRparties){
+                if(party.getPlayers().contains(player)){
+                    playerExists = true;
+                    break;
+                }
+            }
+
+            //okay. NOW if the player exists in a list, we say so and end.
+            if (playerExists = true){
+                Bot.sendMessage(message, "You already exist in a queue.");
+                return;
+
+            //otherwise, if the player isn't in a list, we go ahead and shuffle off to the BRqueue function in QueueServices
+            }else{
+                //tell whats going on
+                Bot.sendMessage(message, "Profile acquired, entering Battle Royal queue...");
+
+                //insert player into BRqueue
+                QueueServices.BRqueue(player);
+                return;
+            }
         }
     }
 }
