@@ -36,7 +36,7 @@ public class QueueBR {
             boolean playerExists = false;
 
             //make sure player isn't already in a list
-            for(PartyClass party : Bot.BRparties){
+            for(PartyClass party : Bot.BR_parties){
                 if(party.getPlayers().contains(player)){
                     playerExists = true;
                     break;
@@ -44,7 +44,7 @@ public class QueueBR {
             }
 
             //okay. NOW if the player exists in a list, we say so and end.
-            if (playerExists = true){
+            if (playerExists == true){
                 Bot.sendMessage(message, "You already exist in a queue.");
                 return;
 
@@ -54,7 +54,7 @@ public class QueueBR {
                 Bot.sendMessage(message, "Profile acquired, entering Battle Royal queue...");
 
                 //insert player into BRqueue
-                QueueServices.BRqueue(player);
+                QueueServices.BR_queue(player);
                 return;
             }
         }

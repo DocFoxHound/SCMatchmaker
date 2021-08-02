@@ -5,6 +5,7 @@ import discord4j.core.object.entity.Message;
 
 import java.sql.*;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.Integer.parseInt;
@@ -371,7 +372,7 @@ public class SQLServices {
     //get BattleRoyal
     public static List<String> getBattleRoyal(String discordID){
         //the list we need to return
-        List<String> results = null;
+        List<String> results = new ArrayList<String>();
 
         //connection string and connection initiation
         Connection conn = null;
@@ -396,7 +397,6 @@ public class SQLServices {
 
             //add the SCHandle
             results.add(handle);
-
 
             //add the ELO
             results.add(elo);

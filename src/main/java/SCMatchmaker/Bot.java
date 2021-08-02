@@ -9,11 +9,15 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Bot {
-    //create the list of BR matchmaking parties
-    public static List<PartyClass> BRparties;
+
+    //create the lists of matchmaking parties
+    public static List<PartyClass> BR_parties = new ArrayList<PartyClass>();
+    public static List<PartyClass> SB_parties = new ArrayList<PartyClass>();
+    public static List<PartyClass> D_parties = new ArrayList<PartyClass>();
 
     //Execute command??
     public interface Command {
@@ -21,6 +25,12 @@ public class Bot {
     }
 
     public static void main(String[] args) {
+        //starting the asynchronous queue function
+        new Thread (() -> {
+            QueueServices.BR_queuePartyManager();
+        }).start();
+        System.out.printf("Battle Royal Queue Party Manager online.\n");
+
         //logging into the bot and keeping it logged in
         String token = "ODU4Mzk1MTU4MjUxOTYyMzg4.YNdgyQ.6GLFlhhhE1HSGJfw0Fh_wvTurGQ";
         GatewayDiscordClient client = DiscordClientBuilder.create(token)
@@ -32,10 +42,11 @@ public class Bot {
         client.getEventDispatcher().on(ReadyEvent.class)
                 .subscribe(event -> {
                     final User self = event.getSelf();
-                    System.out.printf(
-                            "Logged in as %s#%s%n", self.getUsername(), self.getDiscriminator()
+                    System.out.printf("Logged in as %s#%s%n", self.getUsername(), self.getDiscriminator()
                     );
                 });
+
+        System.out.printf("Matchmaker Running.\n");
 
         //check for the ! command
         client.getEventDispatcher().on(MessageCreateEvent.class)
@@ -58,6 +69,8 @@ public class Bot {
         //but I'm not sure how to do that. Also I may need to use .subscribe on login if I wanted
         //to use a daemon thread?
         client.onDisconnect().block();
+
+
     }
 
     //this is the command each server can setup to customize their bot, if need be. Right now it is static.
