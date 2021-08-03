@@ -6,7 +6,6 @@ import discord4j.core.object.entity.Message;
 import java.sql.*;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.List;
 
 import static java.lang.Integer.parseInt;
 
@@ -94,8 +93,9 @@ public class SQLServices {
         }
     }
 
+    //TODO reduce the amount of data kept to only that which we need
     //load BattleRoyal
-    public static String populateACBattleRoyal(ProfileClass user){
+    public static String setBR_Data(ProfileClass player){
         //get date data
         LocalDateTime now = LocalDateTime.now();
         Timestamp sqlNow = Timestamp.valueOf(now);
@@ -114,49 +114,35 @@ public class SQLServices {
                     "ueecitizenrecord," + //3
                     "discordusername," + //4
                     "scorgsid," + //5
-                    "elo," + //6
-                    "rating," + //7
-                    "score," + //8
-                    "playtime," + //9
-                    "scoreperminute," + //10
-                    "damagedealt," + //11
-                    "damagetaken," + //12
-                    "damageratio," + //13
-                    "matches," + //14
-                    "avgmatch," + //15
-                    "wins," + //16
-                    "losses," + //17
-                    "winloss," + //18
-                    "kills," + //19
-                    "deaths," + //20
-                    "killdeath," + //21
-                    "lastupdated)" //22
-                    + " values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"; //its similar but different from other DB languages
+                    "br_elo," + //6
+                    "playtime," + //7
+                    "damagedealt," + //8
+                    "damagetaken," + //9
+                    "matches," + //10
+                    "wins," + //11
+                    "losses," + //12
+                    "kills," + //13
+                    "deaths," + //14
+                    "lastupdated)" //15
+                    + " values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"; //its similar but different from other DB languages
 
             // create the mysql insert preparedstatement and assign all the appropriate values from my two lists (userPage and leaderboard) into the database
             PreparedStatement preparedStmt = conn.prepareStatement(query);
-            preparedStmt.setLong(1, Long.parseLong(user.getDiscordID()));
-            preparedStmt.setString(2, user.getHandle());
-            preparedStmt.setInt(3, Integer.parseInt(user.getUeeCitizenRecord()));
-            preparedStmt.setString(4, user.getDiscordUsername());
-            preparedStmt.setString(5, user.getOrgID());
-            preparedStmt.setDouble(6, user.getBR_ELO());
-            preparedStmt.setInt(7, user.getBR_Rating());
-            preparedStmt.setLong(8, user.getBR_Score());
-            preparedStmt.setInt(9, user.getBR_Playtime());
-            preparedStmt.setDouble(10, user.getBR_ScoreMinute());
-            preparedStmt.setLong(11, user.getBR_DamageDealt());
-            preparedStmt.setLong(12, user.getBR_DamageTaken());
-            preparedStmt.setDouble(13, user.getBR_DamageRatio());
-            preparedStmt.setInt(14, user.getBR_Matches());
-            preparedStmt.setDouble(15, user.getBR_AvgMatch());
-            preparedStmt.setInt(16, user.getBR_Wins());
-            preparedStmt.setInt(17, user.getBR_Losses());
-            preparedStmt.setDouble(18, user.getBR_WinLoss());
-            preparedStmt.setInt(19, user.getBR_Kills());
-            preparedStmt.setInt(20, user.getBR_Deaths());
-            preparedStmt.setDouble(21, user.getBR_KillDeath());
-            preparedStmt.setTimestamp    (22, sqlNow); //lastupdated
+            preparedStmt.setLong(1, Long.parseLong(player.getDiscordID()));
+            preparedStmt.setString(2, player.getHandle());
+            preparedStmt.setInt(3, Integer.parseInt(player.getUeeCitizenRecord()));
+            preparedStmt.setString(4, player.getDiscordUsername());
+            preparedStmt.setString(5, player.getOrgID());
+            preparedStmt.setDouble(6, player.getBR_ELO());
+            preparedStmt.setInt(7, player.getBR_Playtime());
+            preparedStmt.setLong(8, player.getBR_DamageDealt());
+            preparedStmt.setLong(9, player.getBR_DamageTaken());
+            preparedStmt.setInt(10, player.getBR_Matches());
+            preparedStmt.setInt(11, player.getBR_Wins());
+            preparedStmt.setInt(12, player.getBR_Losses());
+            preparedStmt.setInt(13, player.getBR_Kills());
+            preparedStmt.setInt(14, player.getBR_Deaths());
+            preparedStmt.setTimestamp    (15, sqlNow); //lastupdated
 
             // execute the preparedstatement and cram it all in there
             preparedStmt.execute();
@@ -175,89 +161,61 @@ public class SQLServices {
         }
     }
 
-    //load SquadronBattle
-    public static String populateACSquadronBattle(ProfileClass user){
-        //get date data
-        LocalDateTime now = LocalDateTime.now();
-        Timestamp sqlNow = Timestamp.valueOf(now);
+    //get BattleRoyal
+    public static ProfileClass getBR_Data(Message message){
+        ProfileClass player = new ProfileClass();
+        player.setDiscordID(message.getUserData().id().toString());
 
-        //now we add them to the database
-        try
-        {
-            //connection string
+        //connection string and connection initiation
+        Connection conn = null;
+        try{
             String connectionUrl = "jdbc:mysql://na01-sql.pebblehost.com:3306/customer_203228_users";
-            Connection conn = DriverManager.getConnection(connectionUrl, "customer_203228_users", "PRoA@fS6TXRhBn0QXWYy");
+            conn = DriverManager.getConnection(connectionUrl, "customer_203228_users", "PRoA@fS6TXRhBn0QXWYy");
 
-            //the SQL query. this, essentially, tells the Database what it's going to be inserting.
-            String query = " INSERT INTO ACSquadronBattle (" +
-                    "discordid," + //1
-                    "schandle," + //2
-                    "ueecitizenrecord," + //3
-                    "discordusername," + //4
-                    "scorgsid," + //5
-                    "elo," + //6
-                    "rating," + //7
-                    "score," + //8
-                    "playtime," + //9
-                    "scoreperminute," + //10
-                    "damagedealt," + //11
-                    "damagetaken," + //12
-                    "damageratio," + //13
-                    "matches," + //14
-                    "avgmatch," + //15
-                    "wins," + //16
-                    "losses," + //17
-                    "winloss," + //18
-                    "kills," + //19
-                    "deaths," + //20
-                    "killdeath," + //21
-                    "lastupdated)" //22
-                    + " values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"; //its similar but different from other DB languages
+            //the SQL query to get the whole database by DiscordID
+            String Query = "SELECT schandle, " + //1
+                    "br_elo," + //2
+                    "playtime," + //3
+                    "damagedealt," + //4
+                    "damagetaken," + //5
+                    "matches," + //6
+                    "wins," + //7
+                    "losses," + //8
+                    "kills," + //9
+                    "deaths" + //10
+                    " FROM ACBattleRoyal WHERE discordid = " + player.getDiscordID();
 
-            // create the mysql insert preparedstatement and assign all the appropriate values from my two lists (userPage and leaderboard) into the database
-            PreparedStatement preparedStmt = conn.prepareStatement(query);
-            preparedStmt.setLong(1, Long.parseLong(user.getDiscordID()));
-            preparedStmt.setString(2, user.getHandle());
-            preparedStmt.setInt(3, Integer.parseInt(user.getUeeCitizenRecord()));
-            preparedStmt.setString(4, user.getDiscordUsername());
-            preparedStmt.setString(5, user.getOrgID());
-            preparedStmt.setDouble(6, user.getSB_ELO());
-            preparedStmt.setInt(7, user.getSB_Rating());
-            preparedStmt.setLong(8, user.getSB_Score());
-            preparedStmt.setInt(9, user.getSB_Playtime());
-            preparedStmt.setDouble(10, user.getSB_ScoreMinute());
-            preparedStmt.setLong(11, user.getSB_DamageDealt());
-            preparedStmt.setLong(12, user.getSB_DamageTaken());
-            preparedStmt.setDouble(13, user.getSB_DamageRatio());
-            preparedStmt.setInt(14, user.getSB_Matches());
-            preparedStmt.setDouble(15, user.getSB_AvgMatch());
-            preparedStmt.setInt(16, user.getSB_Wins());
-            preparedStmt.setInt(17, user.getSB_Losses());
-            preparedStmt.setDouble(18, user.getSB_WinLoss());
-            preparedStmt.setInt(19, user.getSB_Kills());
-            preparedStmt.setInt(20, user.getSB_Deaths());
-            preparedStmt.setDouble(21, user.getSB_KillDeath());
-            preparedStmt.setTimestamp    (22, sqlNow); //lastupdated
+            //create the java statement that we'll save this as
+            Statement st = conn.createStatement();
 
-            // execute the preparedstatement and cram it all in there
-            preparedStmt.execute();
+            //execute query and get a java resultset
+            ResultSet rs = st.executeQuery(Query);
 
-            //tell the user what just happened and close the connection
-            conn.close();
-            return ":small_blue_diamond: (5/5) User added to Arena Commander: Squadron Battle database.";
-        } catch (SQLException e) { //here we catch the errors
-            //if the error is a duplicate error, let the user know what to do next
-            if(e.toString().contains("Duplicate entry")){
-                return ":small_orange_diamond: (5/5) This Star Citizen account already exists in the Squadron Battle database.";
-            }else{ //all other errors just spit it out into discord
-                //if the connection fails send this message
-                return ":small_red_triangle: SQL Error: " + e.toString();
-            }
+            //rotate next?
+            rs.next();
+
+            player.setHandle(rs.getString(1));
+            player.setBR_ELO(rs.getDouble(2));
+            player.setBR_Playtime(rs.getInt(3));
+            player.setBR_DamageDealt(rs.getLong(4));
+            player.setBR_DamageTaken(rs.getLong(5));
+            player.setBR_Matches(rs.getInt(6));
+            player.setBR_Wins(rs.getInt(7));
+            player.setBR_Losses(rs.getInt(8));
+            player.setBR_Kills(rs.getInt(9));
+            player.setBR_Deaths(rs.getInt(10));
+
+            //return the list
+            return player;
+
+        }catch(SQLException e){
+            player.setHandle("--CONNECTION ERROR--");
+            return player;
         }
     }
 
-    //TODO load Duel. UNUSED.
-    public static String populateACDuel(ProfileClass user){
+    //set the BR elo for a player
+    public static String setBR_Elo(ProfileClass player){
         //get date data
         LocalDateTime now = LocalDateTime.now();
         Timestamp sqlNow = Timestamp.valueOf(now);
@@ -270,70 +228,67 @@ public class SQLServices {
             Connection conn = DriverManager.getConnection(connectionUrl, "customer_203228_users", "PRoA@fS6TXRhBn0QXWYy");
 
             //the SQL query. this, essentially, tells the Database what it's going to be inserting.
-            String query = " INSERT INTO ACSquadronBattle (" +
-                    "discordid," + //1
-                    "schandle," + //2
-                    "ueecitizenrecord," + //3
-                    "discordusername," + //4
-                    "scorgsid," + //5
-                    "elo," + //6
-                    "rating," + //7
-                    "score," + //8
-                    "playtime," + //9
-                    "scoreperminute," + //10
-                    "damagedealt," + //11
-                    "damagetaken," + //12
-                    "damageratio," + //13
-                    "matches," + //14
-                    "avgmatch," + //15
-                    "wins," + //16
-                    "losses," + //17
-                    "winloss," + //18
-                    "kills," + //19
-                    "deaths," + //20
-                    "killdeath," + //21
-                    "lastupdated)" //22
-                    + " values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"; //its similar but different from other DB languages
+            String query = "UPDATE ACBattleRoyal SET br_elo = ?, lastupdated = ? WHERE handle = ?";
 
             // create the mysql insert preparedstatement and assign all the appropriate values from my two lists (userPage and leaderboard) into the database
             PreparedStatement preparedStmt = conn.prepareStatement(query);
-            preparedStmt.setLong(1, Long.parseLong(user.getDiscordID()));
-            preparedStmt.setString(2, user.getHandle());
-            preparedStmt.setInt(3, Integer.parseInt(user.getUeeCitizenRecord()));
-            preparedStmt.setString(4, user.getDiscordUsername());
-            preparedStmt.setString(5, user.getOrgID());
-            preparedStmt.setDouble(6, user.getSB_ELO());
-            preparedStmt.setInt(7, user.getSB_Rating());
-            preparedStmt.setLong(8, user.getSB_Score());
-            preparedStmt.setInt(9, user.getSB_Playtime());
-            preparedStmt.setDouble(10, user.getSB_ScoreMinute());
-            preparedStmt.setLong(11, user.getSB_DamageDealt());
-            preparedStmt.setLong(12, user.getSB_DamageTaken());
-            preparedStmt.setDouble(13, user.getSB_DamageRatio());
-            preparedStmt.setInt(14, user.getSB_Matches());
-            preparedStmt.setDouble(15, user.getSB_AvgMatch());
-            preparedStmt.setInt(16, user.getSB_Wins());
-            preparedStmt.setInt(17, user.getSB_Losses());
-            preparedStmt.setDouble(18, user.getSB_WinLoss());
-            preparedStmt.setInt(19, user.getSB_Kills());
-            preparedStmt.setInt(20, user.getSB_Deaths());
-            preparedStmt.setDouble(21, user.getSB_KillDeath());
-            preparedStmt.setTimestamp    (22, sqlNow); //lastupdated
+            preparedStmt.setDouble(1, player.getBR_ELO());
+            preparedStmt.setTimestamp    (2, sqlNow); //lastupdated
+            preparedStmt.setString(3, player.getHandle());
 
             // execute the preparedstatement and cram it all in there
             preparedStmt.execute();
 
             //tell the user what just happened and close the connection
             conn.close();
-            return ":small_blue_diamond: User added to Duel database.";
+            return "Player " + player.getDiscordUsername() + "'s Elo was successfully updated.";
         } catch (SQLException e) { //here we catch the errors
             //if the error is a duplicate error, let the user know what to do next
-            if(e.toString().contains("Duplicate entry")){
-                return ":small_orange_diamond: This Star Citizen account already exists in the Duel database.";
-            }else{ //all other errors just spit it out into discord
-                //if the connection fails send this message
-                return ":small_red_triangle: SQL Error: " + e.toString();
+            return "There was an error loading the newly calculated Elo of player: " + player.getDiscordUsername();
+        }
+    }
+
+    //return Elo median for BR
+    public static double BR_EloMedian(){
+        double result = 0;
+
+        //store my values in an array
+        ArrayList<Double> array = new ArrayList<>();
+
+        //connection string and connection initiation
+        Connection conn = null;
+        try{
+            String connectionUrl = "jdbc:mysql://na01-sql.pebblehost.com:3306/customer_203228_users";
+            conn = DriverManager.getConnection(connectionUrl, "customer_203228_users", "PRoA@fS6TXRhBn0QXWYy");
+
+            //the SQL query to get the whole database by DiscordID
+            String Query = "SELECT br_elo FROM ACBattleRoyal ";
+
+            //create the java statement that we'll save this as
+            Statement st = conn.createStatement();
+
+            //execute query and get a java resultset
+            ResultSet rs = st.executeQuery(Query);
+
+            //iterate through all the Battle Royal Elo values and add them to an array
+            while(rs.next()){
+                Double value=rs.getDouble("br_elo");
+                array.add(value);
             }
+
+            //iterate through the array, adding them all up
+            for(int i = 0; i<array.size(); i++){
+                result = result+array.get(i);
+            }
+
+            //find the median score
+            result = result/array.size();
+
+            //return that as the new Elo for a new player
+            return result;
+
+        }catch(SQLException e){
+            return 500;
         }
     }
 
@@ -369,44 +324,5 @@ public class SQLServices {
         }
     }
 
-    //get BattleRoyal
-    public static List<String> getBattleRoyal(String discordID){
-        //the list we need to return
-        List<String> results = new ArrayList<String>();
 
-        //connection string and connection initiation
-        Connection conn = null;
-        try{
-            String connectionUrl = "jdbc:mysql://na01-sql.pebblehost.com:3306/customer_203228_users";
-            conn = DriverManager.getConnection(connectionUrl, "customer_203228_users", "PRoA@fS6TXRhBn0QXWYy");
-
-            //the SQL query to get the whole database by DiscordID
-            String Query = "SELECT schandle, rating FROM ACBattleRoyal WHERE discordid = " + discordID;
-
-            //create the java statement that we'll save this as
-            Statement st = conn.createStatement();
-
-            //execute query and get a java resultset
-            ResultSet rs = st.executeQuery(Query);
-
-            //rotate next?
-            rs.next();
-
-            String handle = rs.getString(1);
-            String elo = rs.getString(2);
-
-            //add the SCHandle
-            results.add(handle);
-
-            //add the ELO
-            results.add(elo);
-
-            //return the list
-            return results;
-
-        }catch(SQLException e){
-            results.add(e.toString());
-            return results;
-        }
-    }
 }

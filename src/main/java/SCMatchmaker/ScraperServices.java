@@ -1,5 +1,6 @@
 package SCMatchmaker;
 
+import SCMatchmaker.Models.ProfileClass;
 import discord4j.core.object.entity.Message;
 import org.openqa.selenium.By;
 import org.openqa.selenium.WebDriver;
@@ -14,9 +15,9 @@ import java.util.List;
 
 public class ScraperServices {
     //scrapes the battle royal leaderboard
-    public static List<String> scrapeBattleRoyal(Message message, String handle, WebDriver driver, WebDriverWait wait){
-        //setting up the return list
-        List<String> resultsArray = new ArrayList<>();
+    public static ProfileClass scrapeBattleRoyal(Message message, String handle, WebDriver driver, WebDriverWait wait){
+        //this is going to be our return profileclass
+        ProfileClass player = new ProfileClass();
 
         try{
             //navigate to a website
@@ -57,27 +58,47 @@ public class ScraperServices {
                 wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active")));
             }catch(Exception e){
                 Bot.sendMessage(message, ":small_orange_diamond: (2/5) Battle Royal Leaderboard: Player not found.");
-                for (int x = 0; x<15; x++){
-                    resultsArray.add("1");
-                }//needed to add it 16 times.
-                return resultsArray;
+                player.setMessage(message);
+                player.setHandle(handle);
+                player.setDiscordID(message.getUserData().id().toString());
+                player.setBR_ELO(0.00);
+                player.setBR_Playtime(0);
+                player.setBR_DamageDealt(0);
+                player.setBR_DamageTaken(0);
+                player.setBR_Matches(0);
+                player.setBR_Wins(0);
+                player.setBR_Losses(0);
+                player.setBR_Kills(0);
+                player.setBR_Deaths(0);
+                return player;
             }
 
-            //check if the player selected exists
+            //populate the ProfileClass player
+            player.setMessage(message);
+            player.setHandle(handle);
+            player.setDiscordID(message.getUserData().id().toString());
+            player.setBR_ELO(EloManagerServices.calculateInitialElo()); //sets player's starting Elo to the median of all Elo scores.
+            //going to convert the play time into minutes, first.
+            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:SSS");
+            String timeString = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div:nth-child(8)")).getText();
+            String[] hourMin = timeString.split(":");
+            player.setBR_Playtime((Integer.parseInt((hourMin[0]))* 60) + (Integer.parseInt(hourMin[1]))); //+;
+            //end playtime set
+            player.setBR_DamageDealt(Long.parseLong(driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div.stats-wrap.trans-05s.dogfighting.account.open > div:nth-child(2) > div.stats > li:nth-child(2)")).getText().replaceAll("DAMAGE DEALT:", "")));
+            player.setBR_DamageTaken(Long.parseLong(driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div.stats-wrap.trans-05s.dogfighting.account.open > div:nth-child(2) > div.stats > li:nth-child(1)")).getText().replaceAll("DAMAGE TAKEN:", "")));
+            player.setBR_Matches(Integer.parseInt(driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div.stats-wrap.trans-05s.dogfighting.account.open > div:nth-child(1) > div.stats > li:nth-child(1)")).getText().replaceAll("MATCHES:", "")));
+            player.setBR_Wins(Integer.parseInt(driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div.stats-wrap.trans-05s.dogfighting.account.open > div:nth-child(1) > div.stats > li:nth-child(3)")).getText().replaceAll("WINS:", "")));
+            player.setBR_Losses(Integer.parseInt(driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div.stats-wrap.trans-05s.dogfighting.account.open > div:nth-child(1) > div.stats > li:nth-child(4)")).getText().replaceAll("LOSSES:", "")));
+            player.setBR_Kills(Integer.parseInt(driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div.stats-wrap.trans-05s.dogfighting.account.open > div:nth-child(2) > div.stats > li:nth-child(3)")).getText().replaceAll("KILLS:", "")));
+            player.setBR_Deaths(Integer.parseInt(driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div.stats-wrap.trans-05s.dogfighting.account.open > div:nth-child(2) > div.stats > li:nth-child(4)")).getText().replaceAll("DEATHS:", "")));
 
-            //Retrieve a list of WebElements starting at the cssSelector
-            //these are the stats visible on the standard non-expanded grid.
-            //The reason I am NOT saving these as any datatype right now is because some return as "-" thanks to CiG,
-            //and converting can be try/catched later.
+            //Old code, but worth keeping
+            /*
             String rating = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div:nth-child(3)")).getText();
             String scoreminute = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div:nth-child(4)")).getText();
             String score = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div:nth-child(5)")).getText();
             String damageratio = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div:nth-child(6)")).getText();
             String killdeath = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div:nth-child(7)")).getText();
-            //going to convert the play time into minutes, first.
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:SSS");
-            String timeString = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div:nth-child(8)")).getText();
-            String[] hourMin = timeString.split(":");
             String playtime = String.valueOf((Integer.parseInt(hourMin[0])*60)+Integer.parseInt(hourMin[1]));
             //below are inside the expanded box. You have to remove some text before they can be stored.
             String matches = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div.stats-wrap.trans-05s.dogfighting.account.open > div:nth-child(1) > div.stats > li:nth-child(1)")).getText().replaceAll("MATCHES:", "");
@@ -91,137 +112,28 @@ public class ScraperServices {
             String damagedealt = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div.stats-wrap.trans-05s.dogfighting.account.open > div:nth-child(2) > div.stats > li:nth-child(2)")).getText().replaceAll("DAMAGE DEALT:", "");
             String kills = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div.stats-wrap.trans-05s.dogfighting.account.open > div:nth-child(2) > div.stats > li:nth-child(3)")).getText().replaceAll("KILLS:", "");
             String deaths = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div.stats-wrap.trans-05s.dogfighting.account.open > div:nth-child(2) > div.stats > li:nth-child(4)")).getText().replaceAll("DEATHS:", "");
-
-            //place the results in an array list
-            resultsArray.add(rating); //index: 0
-            resultsArray.add(scoreminute); //index: 1
-            resultsArray.add(score); //index: 2
-            resultsArray.add(damageratio); //index: 3
-            resultsArray.add(killdeath); //index: 4
-            resultsArray.add(playtime); //index: 5
-            resultsArray.add(matches); //index: 6
-            resultsArray.add(avgmatch); //index: 7
-            resultsArray.add(wins); //index: 8
-            resultsArray.add(losses); //index: 9
-            resultsArray.add(winloss); //index: 10
-            resultsArray.add(damagetaken); //index: 11
-            resultsArray.add(damagedealt); //index: 12
-            resultsArray.add(kills); //index: 13
-            resultsArray.add(deaths); //index: 14
+             */
 
             //update user
             Bot.sendMessage(message, ":small_blue_diamond: (2/5) Battle Royal Leaderboard Verified...");
 
             //return the results as an array. There are 16 results total
-            return resultsArray;
+            return player;
         }catch(Exception e){
             Bot.sendMessage(message, ":small_red_triangle: Battle Royal Leaderboard Error: " + e);
-            return resultsArray;
-        }
-    }
-
-    //scrapes the squadron battle leaderboard
-    public static List<String> scrapeSquadronBattle(Message message, String handle, WebDriver driver, WebDriverWait wait){
-        //setting up the return list
-        List<String> resultsArray = new ArrayList<>();
-
-        try{
-            //navigate to a website
-            driver.navigate().to("https://robertsspaceindustries.com/community/leaderboards/all?mode=SB");
-
-            //save the xPath of the season dropdown menu
-            String seasonButton = "//*[@id=\"leaderboard-filters\"]/div[3]/div[2]/fieldset[3]/a";
-
-            //wait until the dropdown menu is loaded on the page before clicking it
-            wait.until(ExpectedConditions.elementToBeClickable(By.xpath(seasonButton)));
-
-            //click the dropdown menu
-            driver.findElement(By.xpath(seasonButton)).click();
-
-            //get the xPath value of 3.11
-            String onlyWorkingSeason = "//*[@id=\"leaderboard-filters\"]/div[3]/div[2]/fieldset[3]/a/ul/li[3]";
-
-            //click 3.11
-            driver.findElement(By.xpath(onlyWorkingSeason)).click();
-
-            //get the Find Player textbox
-            WebElement findPlayer = driver.findElement(By.xpath("//*[@id=\"leaderboard-filters\"]/div[3]/div[2]/fieldset[1]/div/div/input"));
-
-            //look for the user
-            findPlayer.sendKeys(handle);
-
-            //save the xPath of the season dropdown menu
-            String userPopOut = "//*[@id=\"leaderboard-filters\"]/div[3]/div[2]/fieldset[1]/div/div/div";
-
-            //wait until the user is visible as it sometimes takes a moment
-            wait.until(ExpectedConditions.elementToBeClickable(By.xpath(userPopOut)));
-
-            //click the user and wait for it to load
-            driver.findElement(By.xpath(userPopOut)).click();
-
-            try{
-                //wait for the player to load
-                wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active")));
-            }catch(Exception e){
-                Bot.sendMessage(message, ":small_orange_diamond: (3/5) Squadron Battle Leaderboard: Player not found");
-                for (int x = 0; x<15; x++){
-                    resultsArray.add("1");
-                }//needed to add it 15 times.
-                return resultsArray;
-            }
-
-            //Retrieve a list of WebElements starting at the cssSelector
-            //these are the stats visible on the standard non-expanded grid.
-            //The reason I am NOT saving these as any datatype right now is because some return as "-" thanks to CiG,
-            //and converting can be try/catched later.
-            String rating = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div:nth-child(3)")).getText();
-            String scoreminute = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div:nth-child(4)")).getText();
-            String score = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div:nth-child(5)")).getText();
-            String damageratio = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div:nth-child(6)")).getText();
-            String killdeath = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div:nth-child(7)")).getText();
-            //going to convert the play time into minutes, first.
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:SSS");
-            String timeString = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div:nth-child(8)")).getText();
-            String[] hourMin = timeString.split(":");
-            String playtime = String.valueOf((Integer.parseInt(hourMin[0])*60)+Integer.parseInt(hourMin[1]));
-            //below are inside the expanded box. You have to remove some text before they can be stored.
-            String matches = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div.stats-wrap.trans-05s.dogfighting.account.open > div:nth-child(1) > div.stats > li:nth-child(1)")).getText().replaceAll("MATCHES:", "");
-            String avgMatchTimeString = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div.stats-wrap.trans-05s.dogfighting.account.open > div:nth-child(1) > div.stats > li:nth-child(2)")).getText().replaceAll("AVG MATCH:", "");
-            hourMin = avgMatchTimeString.split(":");
-            String avgmatch = String.valueOf((Integer.parseInt(hourMin[0])*60)+Integer.parseInt(hourMin[1]));
-            String wins = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div.stats-wrap.trans-05s.dogfighting.account.open > div:nth-child(1) > div.stats > li:nth-child(3)")).getText().replaceAll("WINS:", "");
-            String losses = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div.stats-wrap.trans-05s.dogfighting.account.open > div:nth-child(1) > div.stats > li:nth-child(4)")).getText().replaceAll("LOSSES:", "");
-            String winloss = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div.stats-wrap.trans-05s.dogfighting.account.open > div:nth-child(1) > div.stats > li:nth-child(5)")).getText().replaceAll("WIN/LOSS:", "");
-            String damagetaken = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div.stats-wrap.trans-05s.dogfighting.account.open > div:nth-child(2) > div.stats > li:nth-child(1)")).getText().replaceAll("DAMAGE TAKEN:", "");
-            String damagedealt = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div.stats-wrap.trans-05s.dogfighting.account.open > div:nth-child(2) > div.stats > li:nth-child(2)")).getText().replaceAll("DAMAGE DEALT:", "");
-            String kills = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div.stats-wrap.trans-05s.dogfighting.account.open > div:nth-child(2) > div.stats > li:nth-child(3)")).getText().replaceAll("KILLS:", "");
-            String deaths = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div.stats-wrap.trans-05s.dogfighting.account.open > div:nth-child(2) > div.stats > li:nth-child(4)")).getText().replaceAll("DEATHS:", "");
-
-            //place the results in an array list
-            resultsArray.add(rating); //index: 0
-            resultsArray.add(scoreminute); //index: 1
-            resultsArray.add(score); //index: 2
-            resultsArray.add(damageratio); //index: 3
-            resultsArray.add(killdeath); //index: 4
-            resultsArray.add(playtime); //index: 5
-            resultsArray.add(matches); //index: 6
-            resultsArray.add(avgmatch); //index: 7
-            resultsArray.add(wins); //index: 8
-            resultsArray.add(losses); //index: 9
-            resultsArray.add(winloss); //index: 10
-            resultsArray.add(damagetaken); //index: 11
-            resultsArray.add(damagedealt); //index: 12
-            resultsArray.add(kills); //index: 13
-            resultsArray.add(deaths); //index: 14
-
-            //update user
-            Bot.sendMessage(message, ":small_blue_diamond: (3/5) Squadron Battle Leaderboard Verified...");
-
-            //return the results as an array. There are 16 results total
-            return resultsArray;
-        }catch(Exception e){
-            Bot.sendMessage(message, ":small_red_triangle: Squadron Battle Leaderboard Error: " + e);
-            return resultsArray;
+            player.setMessage(message);
+            player.setHandle(handle);
+            player.setDiscordID(message.getUserData().id().toString());
+            player.setBR_ELO(0.00);
+            player.setBR_Playtime(0);
+            player.setBR_DamageDealt(0);
+            player.setBR_DamageTaken(0);
+            player.setBR_Matches(0);
+            player.setBR_Wins(0);
+            player.setBR_Losses(0);
+            player.setBR_Kills(0);
+            player.setBR_Deaths(0);
+            return player;
         }
     }
 
@@ -362,98 +274,5 @@ public class ScraperServices {
         }
     }
 
-    //TODO scrapes the duel leaderboard. UNUSED.
-    public static List<String> scrapeDuel(Message message, String handle, WebDriver driver, WebDriverWait wait){
-        try{
-            //setup the return list
-            List<String> resultsArray = new ArrayList<>();
 
-            //navigate to a website
-            driver.navigate().to("https://robertsspaceindustries.com/community/leaderboards/all?mode=BR");
-
-            //save the xPath of the season dropdown menu
-            String seasonButton = "//*[@id=\"leaderboard-filters\"]/div[3]/div[2]/fieldset[3]/a";
-
-            //wait until the dropdown menu is loaded on the page before clicking it
-            wait.until(ExpectedConditions.elementToBeClickable(By.xpath(seasonButton)));
-
-            //click the dropdown menu
-            driver.findElement(By.xpath(seasonButton)).click();
-
-            //get the xPath value of 3.11
-            String onlyWorkingSeason = "//*[@id=\"leaderboard-filters\"]/div[3]/div[2]/fieldset[3]/a/ul/li[3]";
-
-            //click 3.11
-            driver.findElement(By.xpath(onlyWorkingSeason)).click();
-
-            //get the Find Player textbox
-            WebElement findPlayer = driver.findElement(By.xpath("//*[@id=\"leaderboard-filters\"]/div[3]/div[2]/fieldset[1]/div/div/input"));
-
-            //look for the user
-            findPlayer.sendKeys(handle);
-
-            //save the xPath of the season dropdown menu
-            String userPopOut = "//*[@id=\"leaderboard-filters\"]/div[3]/div[2]/fieldset[1]/div/div/div";
-
-            //wait until the user is visible as it sometimes takes a moment
-            wait.until(ExpectedConditions.elementToBeClickable(By.xpath(userPopOut)));
-
-            //click the user and wait for it to load
-            driver.findElement(By.xpath(userPopOut)).click();
-            wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active")));
-
-            //Retrieve a list of WebElements starting at the cssSelector
-            //these are the stats visible on the standard non-expanded grid.
-            //The reason I am NOT saving these as any datatype right now is because some return as "-" thanks to CiG,
-            //and converting can be try/catched later.
-            String rating = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div:nth-child(3)")).getText();
-            String scoreminute = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div:nth-child(4)")).getText();
-            String score = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div:nth-child(5)")).getText();
-            String damageratio = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div:nth-child(6)")).getText();
-            String killdeath = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div:nth-child(7)")).getText();
-            //going to convert the play time into minutes, first.
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd hh:mm:SSS");
-            String timeString = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div:nth-child(8)")).getText();
-            String[] hourMin = timeString.split(":");
-            String playtime = String.valueOf((Integer.parseInt(hourMin[0])*60)+Integer.parseInt(hourMin[1]));
-            //below are inside the expanded box. You have to remove some text before they can be stored.
-            String matches = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div.stats-wrap.trans-05s.dogfighting.account.open > div:nth-child(1) > div.stats > li:nth-child(1)")).getText().replaceAll("MATCHES:", "");
-            String avgMatchTimeString = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div.stats-wrap.trans-05s.dogfighting.account.open > div:nth-child(1) > div.stats > li:nth-child(2)")).getText().replaceAll("AVG MATCH:", "");
-            hourMin = avgMatchTimeString.split(":");
-            String avgmatch = String.valueOf((Integer.parseInt(hourMin[0])*60)+Integer.parseInt(hourMin[1]));
-            String wins = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div.stats-wrap.trans-05s.dogfighting.account.open > div:nth-child(1) > div.stats > li:nth-child(3)")).getText().replaceAll("WINS:", "");
-            String losses = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div.stats-wrap.trans-05s.dogfighting.account.open > div:nth-child(1) > div.stats > li:nth-child(4)")).getText().replaceAll("LOSSES:", "");
-            String winloss = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div.stats-wrap.trans-05s.dogfighting.account.open > div:nth-child(1) > div.stats > li:nth-child(5)")).getText().replaceAll("WIN/LOSS:", "");
-            String damagetaken = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div.stats-wrap.trans-05s.dogfighting.account.open > div:nth-child(2) > div.stats > li:nth-child(1)")).getText().replaceAll("DAMAGE TAKEN:", "");
-            String damagedealt = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div.stats-wrap.trans-05s.dogfighting.account.open > div:nth-child(2) > div.stats > li:nth-child(2)")).getText().replaceAll("DAMAGE DEALT:", "");
-            String kills = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div.stats-wrap.trans-05s.dogfighting.account.open > div:nth-child(2) > div.stats > li:nth-child(3)")).getText().replaceAll("KILLS:", "");
-            String deaths = driver.findElement(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active > div.stats-wrap.trans-05s.dogfighting.account.open > div:nth-child(2) > div.stats > li:nth-child(4)")).getText().replaceAll("DEATHS:", "");
-
-            //place the results in an array list
-            resultsArray.add(rating); //index: 0
-            resultsArray.add(scoreminute); //index: 1
-            resultsArray.add(score); //index: 2
-            resultsArray.add(damageratio); //index: 3
-            resultsArray.add(killdeath); //index: 4
-            resultsArray.add(playtime); //index: 5
-            resultsArray.add(matches); //index: 6
-            resultsArray.add(avgmatch); //index: 7
-            resultsArray.add(wins); //index: 8
-            resultsArray.add(losses); //index: 9
-            resultsArray.add(winloss); //index: 10
-            resultsArray.add(damagetaken); //index: 11
-            resultsArray.add(damagedealt); //index: 12
-            resultsArray.add(kills); //index: 13
-            resultsArray.add(deaths); //index: 14
-
-            //update user
-            Bot.sendMessage(message, ":small_blue_diamond: Duel Leaderboard Verified...");
-
-            //return the results as an array. There are 16 results total
-            return resultsArray;
-        }catch(Exception e){
-            Bot.sendMessage(message, ":small_red_triangle: Duel Leaderboard Error: " + e);
-        }
-        return null;
-    }
 }
