@@ -54,7 +54,6 @@ public class QueueServices {
 
                         //if there are so many players in a party, launch the party
                         if (amountOfPlayers == BR_PartySizeLimit){
-                            //TODO party launch
                             //make a copy of the party at that location
                             PartyClass party = Bot.BR_parties.get(i);
 
@@ -64,12 +63,23 @@ public class QueueServices {
                             }).start();
                             System.out.printf("Battle Royal Queue Party Manager online.\n");
 
+                            //make a list of players
+                            String stringOfPlayers = new String();
+                            for(ProfileClass player : party.getPlayers()){
+                                stringOfPlayers = stringOfPlayers + "\n" + player.getHandle();
+                            }
+
+                            //send the list of names to the queued player
+                            for(ProfileClass player : party.getPlayers()){
+                                MessageServices.sendPrivateMessage(player.getUser(), "Your match is ready. The " +
+                                        "following is the list of opponents that are queued with you: " + stringOfPlayers);
+                            }
+
                             //remove the party from the master list
                             Bot.BR_parties.remove(i);
-
                         //if the life of the party is over 300 seconds, launch the party
                         }else if(partyLife > 300){
-                            //TODO party launch
+                            //make a copy of the party at that location
                             PartyClass party = Bot.BR_parties.get(i);
 
                             //starting the asynchronous Elo Manager function
@@ -78,16 +88,30 @@ public class QueueServices {
                             }).start();
                             System.out.printf("Battle Royal Queue Party Manager online.\n");
 
+                            //make a list of players
+                            String stringOfPlayers = new String();
+                            for(ProfileClass player : party.getPlayers()){
+                                stringOfPlayers = stringOfPlayers + "\n" + player.getHandle();
+                            }
+
+                            //send the list of names to the queued player
+                            for(ProfileClass player : party.getPlayers()){
+                                MessageServices.sendPrivateMessage(player.getUser(), "Your match is ready. The " +
+                                        "following is the list of opponents that are queued with you: " + stringOfPlayers);
+                            }
+
+                            //remove the party from the master list
                             Bot.BR_parties.remove(i);
 
+                        }else{
                         //------------------------
                         //MANAGEMENT STUFF
                         //------------------------
-                        }else{
+
                             //------
-                            //FIRST: Party Bump
+                            //FIRST: Party Touching
                             //------
-                            //if two parties bump, absorb smaller if they can fit the players by age, otherwise limit expansion
+                            //if two parties touch, absorb smaller if they can fit the players by age, otherwise limit expansion
                             //here, we are iterating through a list of parties again, minus ours
                             for(int x = 0; x < Bot.BR_parties.size();){
                                 //if its our party, don't compare them
@@ -206,7 +230,7 @@ public class QueueServices {
                         Bot.BR_parties.get(i).getPlayers().size() < 10)
                 {
                         Bot.BR_parties.get(i).addPlayer(player);
-                        Bot.sendMessage(player.getMessage(), "You have successfully queued for Battle Royal.");
+                        MessageServices.sendMessage(player.getMessage(), "You have successfully queued for Battle Royal.");
                         return;
                 //create a party
                 }else if((i+1) > Bot.BR_parties.size()){
@@ -221,7 +245,7 @@ public class QueueServices {
                     Bot.BR_parties.add(newParty);
 
                     //send a message
-                    Bot.sendMessage(player.getMessage(), "You have successfully queued for Battle Royal (FIRST MEMBER)");
+                    MessageServices.sendMessage(player.getMessage(), "You have successfully queued for Battle Royal (FIRST MEMBER)");
 
                     //exit iterator
                     return;
@@ -244,7 +268,7 @@ public class QueueServices {
             Bot.BR_parties.add(newParty);
 
             //send a message
-            Bot.sendMessage(player.getMessage(), "You have successfully queued for Battle Royal (PARTY LEADER)");
+            MessageServices.sendMessage(player.getMessage(), "You have successfully queued for Battle Royal (PARTY LEADER)");
         }
 
 

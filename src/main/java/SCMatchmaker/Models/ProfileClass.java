@@ -1,9 +1,11 @@
 package SCMatchmaker.Models;
 
 import discord4j.core.object.entity.Message;
+import discord4j.core.object.entity.User;
 
 public class ProfileClass {
     private Message message;
+    private User user;
     private String citizenURL;
     private String discordID;
     private String handle;
@@ -65,6 +67,7 @@ public class ProfileClass {
     public ProfileClass(){}
 
     public ProfileClass(Message message,
+                        User user,
                         String citizenURL,
                         String discordID,
                         String handle,
@@ -123,6 +126,7 @@ public class ProfileClass {
                         int D_deaths,
                         double D_killDeath) {
         this.message = message;
+        this.user = user;
         this.citizenURL = citizenURL;
         this.discordID = discordID;
         this.handle = handle;
@@ -189,6 +193,7 @@ public class ProfileClass {
     public Message getMessage(){
         return this.message;
     }
+    public User getUser() { return this.user; }
     public String getCitizenURL(){
         return this.citizenURL;
     }
@@ -290,6 +295,7 @@ public class ProfileClass {
     //-----------------------------------------------------------------
 
     public void setMessage(Message newMessage){ this.message = newMessage; }
+    public void setUser (User newUser) { this.user = newUser; }
     public void setCitizenURL(String newURL){ this.citizenURL = newURL; }
     public void setDiscordID(String newID) { this.discordID = newID; }
     public void setHandle(String newHandle){ this.handle = newHandle; }

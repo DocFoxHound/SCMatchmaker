@@ -1,6 +1,6 @@
 package SCMatchmaker.Commands;
 
-import SCMatchmaker.Bot;
+import SCMatchmaker.MessageServices;
 import SCMatchmaker.Models.ProfileClass;
 import SCMatchmaker.SQLServices;
 import SCMatchmaker.ScraperServices;
@@ -26,7 +26,7 @@ public class NewUser {
 
         //check that they actually put text/url after the command
         if(player.getCitizenURL().equals("")){
-            Bot.sendMessage(player.getMessage(), ":small_red_triangle: Please use the new user command with your discord profile" +
+            MessageServices.sendMessage(player.getMessage(), ":small_red_triangle: Please use the new user command with your discord profile" +
                     "link afterwards. It should look similar to the following: \n" +
                     "``!newuser https://robertsspaceindustries.com/citizens/YOUR_HANDLE_HERE``" +
                     "\n:small_red_triangle: **PROCESS ABORTED**");
@@ -47,7 +47,7 @@ public class NewUser {
 
                 //if the userPage is empty then that means the verification process did not finish. Another error is also thrown.
                 if(userPage.size()==0){
-                    Bot.sendMessage(player.getMessage(), ":small_red_triangle: **PROCESS ABORTED**.");
+                    MessageServices.sendMessage(player.getMessage(), ":small_red_triangle: **PROCESS ABORTED**.");
                     //close the browser
                     driver.close();
                     return;
@@ -71,11 +71,11 @@ public class NewUser {
                     userPage = null;
 
                     //process the database and return the readout to the user
-                    Bot.sendMessage(player.getMessage(), SQLServices.setBR_Data(player));
+                    MessageServices.sendMessage(player.getMessage(), SQLServices.setBR_Data(player));
                     //Bot.sendMessage(player.getMessage(), SQLServices.setSB_Data(player));
                     //Bot.sendMessage(user.getMessage(), SQLServices.populateACDuel(user));
 
-                    Bot.sendMessage(player.getMessage(), "**PROCESS COMPLETE**");
+                    MessageServices.sendMessage(player.getMessage(), "**PROCESS COMPLETE**");
                 }
                 return;
             }else{//if the DiscordID DOES exist, halt

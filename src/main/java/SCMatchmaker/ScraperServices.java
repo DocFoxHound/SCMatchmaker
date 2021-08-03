@@ -57,7 +57,7 @@ public class ScraperServices {
                 //wait for the user panel to pop up
                 wait.until(ExpectedConditions.elementToBeClickable(By.cssSelector("#leaderboard-data > li.row.clearfix.trans-02s.animDone.active")));
             }catch(Exception e){
-                Bot.sendMessage(message, ":small_orange_diamond: (2/5) Battle Royal Leaderboard: Player not found.");
+                MessageServices.sendMessage(message, ":small_orange_diamond: (2/5) Battle Royal Leaderboard: Player not found.");
                 player.setMessage(message);
                 player.setHandle(handle);
                 player.setDiscordID(message.getUserData().id().toString());
@@ -115,12 +115,12 @@ public class ScraperServices {
              */
 
             //update user
-            Bot.sendMessage(message, ":small_blue_diamond: (2/5) Battle Royal Leaderboard Verified...");
+            MessageServices.sendMessage(message, ":small_blue_diamond: (2/5) Battle Royal Leaderboard Verified...");
 
             //return the results as an array. There are 16 results total
             return player;
         }catch(Exception e){
-            Bot.sendMessage(message, ":small_red_triangle: Battle Royal Leaderboard Error: " + e);
+            MessageServices.sendMessage(message, ":small_red_triangle: Battle Royal Leaderboard Error: " + e);
             player.setMessage(message);
             player.setHandle(handle);
             player.setDiscordID(message.getUserData().id().toString());
@@ -186,7 +186,7 @@ public class ScraperServices {
                     String orgSID = driver.findElement(By.cssSelector("#public-profile > div.profile-content.overview-content.clearfix > div.box-content.profile-wrapper.clearfix > div > div.main-org.right-col.visibility-V > div > div.info > p:nth-child(2) > strong")).getText();
 
                     //update user and close driver
-                    Bot.sendMessage(message, ":small_blue_diamond: (1/5) Profile Page verified...");
+                    MessageServices.sendMessage(message, ":small_blue_diamond: (1/5) Profile Page verified...");
 
                     //place the results in an array list
                     resultsArray.add(handle); //index: 0
@@ -196,13 +196,13 @@ public class ScraperServices {
                     return resultsArray;
                 }
             }else{
-                Bot.sendMessage(message, ":small_red_triangle: There was an error, please check your URL and ensure the following text " +
+                MessageServices.sendMessage(message, ":small_red_triangle: There was an error, please check your URL and ensure the following text " +
                         "is located inside your StarCitizen Bio:");
-                Bot.sendMessage(message, message.getUserData().id().toString());
+                MessageServices.sendMessage(message, message.getUserData().id().toString());
                 return resultsArray;
             }
         }catch(Exception e){
-            Bot.sendMessage(message, ":small_red_triangle: The URL was invalid, please double-check and try again. It should look like the following:" +
+            MessageServices.sendMessage(message, ":small_red_triangle: The URL was invalid, please double-check and try again. It should look like the following:" +
                     "\n`` !newuser https://robertsspaceindustries.com/citizens/YOUR_HANDLE_HERE ``");
             return resultsArray;
         }
@@ -253,7 +253,7 @@ public class ScraperServices {
                 String orgSID = driver.findElement(By.cssSelector("#public-profile > div.profile-content.overview-content.clearfix > div.box-content.profile-wrapper.clearfix > div > div.main-org.right-col.visibility-V > div > div.info > p:nth-child(2) > strong")).getText();
 
                 //update user and close driver
-                Bot.sendMessage(message, ":small_blue_diamond: (1/5) Profile Page verified...");
+                MessageServices.sendMessage(message, ":small_blue_diamond: (1/5) Profile Page verified...");
 
                 //place the results in an array list
                 resultsArray.add(handle); //index: 0
@@ -262,13 +262,13 @@ public class ScraperServices {
 
                 return resultsArray;
             }else{
-                Bot.sendMessage(message, ":small_red_triangle: There was an error, please check your URL and ensure the following text " +
+                MessageServices.sendMessage(message, ":small_red_triangle: There was an error, please check your URL and ensure the following text " +
                         "is located inside your StarCitizen Bio:");
-                Bot.sendMessage(message, message.getUserData().id().toString());
+                MessageServices.sendMessage(message, message.getUserData().id().toString());
                 return resultsArray;
             }
         }catch(Exception e){
-            Bot.sendMessage(message, ":small_red_triangle: The URL was invalid, please double-check and try again. It should look like the following:" +
+            MessageServices.sendMessage(message, ":small_red_triangle: The URL was invalid, please double-check and try again. It should look like the following:" +
                     "\n`` !newuser https://robertsspaceindustries.com/citizens/YOUR_HANDLE_HERE ``");
             return resultsArray;
         }

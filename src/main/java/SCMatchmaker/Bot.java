@@ -1,7 +1,6 @@
 package SCMatchmaker;
 
 import SCMatchmaker.Models.PartyClass;
-import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.lifecycle.ReadyEvent;
@@ -63,7 +62,8 @@ public class Bot {
                     //server, the message content, and the sender, which can all be useful when
                     //processing commands
                     Message message = event.getMessage();
-                    CommandServices.onMessage(message); //this is the method we're sending the message to.
+                    User user = new User(message.getClient(),message.getUserData());
+                    CommandServices.onMessage(message, user); //this is the method we're sending the message to.
                 });
         //prevents disconnect. I hear if I have a daemon thread running I wont need to use this,
         //but I'm not sure how to do that. Also I may need to use .subscribe on login if I wanted
@@ -78,20 +78,6 @@ public class Bot {
     //correctly, which I don't think I can haha. We can talk about this later.
     public static String cmdChar(){
         return("!");
-    }
-
-    //I just decided to make my own method for handling sending messages back to Discord. Its completely unnecessary,
-    //but it is shorter than typing it all out. the Return block shows the full way to send a message, just replace
-    //text with "strings go here" to send a message yourself.
-    public static Message sendMessage(Message message, String text){
-        return (message.getChannel().block().createMessage(text).block());
-    }
-
-    public static Message sendMessageTest(Message message, String text){
-        Snowflake channelId = message.getChannelId();
-        String messageString = message.toString();
-        //Message newMessage = ;
-        return (message.getChannel().block().createMessage(text).block());
     }
 
 }

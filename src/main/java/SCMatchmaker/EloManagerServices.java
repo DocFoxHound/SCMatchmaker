@@ -50,7 +50,7 @@ public class EloManagerServices {
                 if (oldPlayerStats.getBR_Playtime() != newPlayerStats.getBR_Playtime()){
                     //adjust the player's Elo according to the Elo modifier
                     newPlayerStats.setBR_ELO(oldPlayerStats.getBR_ELO() + calculateMatchElo(newPlayerStats, oldPlayerStats, lowestPartyElo, highestPartyElo, averagePartyElo));
-                    Bot.sendMessage(oldPlayerStats.getMessage(), SQLServices.setBR_Elo(newPlayerStats));
+                    MessageServices.sendMessage(oldPlayerStats.getMessage(), SQLServices.setBR_Elo(newPlayerStats));
                 }
             }
             //end the thread

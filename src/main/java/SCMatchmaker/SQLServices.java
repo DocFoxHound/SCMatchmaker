@@ -35,7 +35,7 @@ public class SQLServices {
             //so ResultSets do not have .isEmpty or .isNull properties, so this is how you check...
             //by the way, this is checking to see if said user exists.
             if (BR_rs.getInt(1) == 1 && BR_rs.getInt(1) == 1) {
-                Bot.sendMessage(message, ":small_red_triangle: Your DiscordID already exists in the database! If you need to update your " +
+                MessageServices.sendMessage(message, ":small_red_triangle: Your DiscordID already exists in the database! If you need to update your " +
                         "Discord and Star Citizen accounts, please use the !updateme command like this:\n" +
                         "`` !updateme https://robertsspaceindustries.com/citizens/YOUR_HANDLE_HERE  ``");
                 conn.close();
@@ -45,7 +45,7 @@ public class SQLServices {
                 return false;
             }
         } catch (SQLException e) {
-            Bot.sendMessage(message, ":small_red_triangle: Connection error: " + e);
+            MessageServices.sendMessage(message, ":small_red_triangle: Connection error: " + e);
             return true;
         }
     }
@@ -78,7 +78,7 @@ public class SQLServices {
             //so ResultSets do not have .isEmpty or .isNull properties, so this is how you check...
             //by the way, this is checking to see if said user exists.
             if (rs.getInt(1) == 1) {
-                Bot.sendMessage(message, ":small_red_triangle: This StarCitizen account already exists in the database! If you need to update your " +
+                MessageServices.sendMessage(message, ":small_red_triangle: This StarCitizen account already exists in the database! If you need to update your " +
                         "Discord and Star Citizen accounts, please use the !updateme command like this:\n" +
                         "`` !updateme https://robertsspaceindustries.com/citizens/YOUR_HANDLE_HERE ``");
                 conn.close();
@@ -88,7 +88,7 @@ public class SQLServices {
                 return false;
             }
         } catch (SQLException e) {
-            Bot.sendMessage(message, ":small_red_triangle: Connection error: " + e);
+            MessageServices.sendMessage(message, ":small_red_triangle: Connection error: " + e);
             return true;
         }
     }
