@@ -10,7 +10,9 @@ public class PartyClass {
     private long timeStarted;
     private double eloModifier;
 
-    public PartyClass(List<ProfileClass> players, double eloStart, double eloMax, double eloMinimum, long timeStarted) {
+    private ProfileClass partyLeader;
+
+    public PartyClass(List<ProfileClass> players, double eloStart, double eloMax, double eloMinimum, long timeStarted, ProfileClass partyLeader) {
         this.players = players;
         this.eloStart = eloStart;
         this.eloMax = eloMax;
@@ -68,5 +70,13 @@ public class PartyClass {
 
     public void setEloModifier(double eloModifier) {
         this.eloModifier = eloModifier;
+    }
+
+    public ProfileClass getPartyLeader() {
+        return partyLeader;
+    }
+
+    public void setPartyLeader(ProfileClass partyLeader) {
+        this.partyLeader = partyLeader;
     }
 }

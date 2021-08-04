@@ -52,7 +52,7 @@ public class QueueBR {
                     MessageServices.sendMessage(message, "You already exist in a queue for: " + partyPlayerExistsIn);
                     return;
 
-                    //otherwise, if the player isn't in a list, we go ahead and shuffle off to the BRqueue function in QueueServices
+                //otherwise, if the player isn't in a list, we go ahead and shuffle off to the BRqueue function in QueueServices
                 }else{
                     //tell whats going on
                     MessageServices.sendMessage(message, "Profile acquired, entering Battle Royal queue...");

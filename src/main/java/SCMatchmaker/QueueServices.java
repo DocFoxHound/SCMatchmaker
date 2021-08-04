@@ -23,17 +23,37 @@ public class QueueServices {
         //make a list of players
         String stringOfPlayers = new String();
         for(ProfileClass player : party.getPlayers()){
-            stringOfPlayers = stringOfPlayers + "\n" + player.getHandle();
+            stringOfPlayers = stringOfPlayers + "\n:small_blue_diamond: " + player.getHandle();
         }
 
         //send the list of names to the queued player
         for(ProfileClass player : party.getPlayers()){
-            MessageServices.sendPrivateMessage(player.getUser(), "Your match is ready. The " +
-                    "following is the list of opponents that are queued with you: " + stringOfPlayers);
+            MessageServices.sendPrivateMessage(player.getUser(), "**MATCHMAKING COMPLETE**" +
+                    "\nThe party leader is: **" + Bot.BR_parties.get(i).getPartyLeader() + "**" +
+                    "\nAs the Party Leader, **" + Bot.BR_parties.get(i).getPartyLeader() + "** is responsible for adding " +
+                    "and inviting all the listed players in Star Citizen to a Battle Royal game. All party members should " +
+                    "add **" + Bot.BR_parties.get(i).getPartyLeader() + "** as a friend to help them out." +
+                    "\nList of members:" + stringOfPlayers);
         }
 
         //remove the party from the master list
         Bot.BR_parties.remove(i);
+    }
+
+    public static void BR_createParty(ProfileClass player){
+        //make a list of our one player
+        List<ProfileClass> players = new ArrayList<>();
+        players.add(player);
+
+        //create a party
+        PartyClass newParty = new PartyClass(players, player.getBR_ELO(), player.getBR_ELO()+200, player.getBR_ELO()-200, System.currentTimeMillis(), player);
+        newParty.setPartyLeader(player);
+
+        //add the new party to the BR_parties list
+        Bot.BR_parties.add(newParty);
+
+        //send a message
+        MessageServices.sendMessage(player.getMessage(), "You have successfully queued for Battle Royal (Parties)");
     }
 
     public static void BR_queuePartyManager(){
@@ -44,7 +64,7 @@ public class QueueServices {
         while(true){
             try {
                 //we'll check on the parties every so often
-                TimeUnit.SECONDS.sleep(10);
+                TimeUnit.SECONDS.sleep(5);
 
                 //get this iterations date/time
                 Date date = new Date();
@@ -83,7 +103,7 @@ public class QueueServices {
                             BR_launchParty(i);
                             i--;
                         //if the life of the party is over 300 seconds (5 minutes), launch the party
-                        }else if(partyLife > 600){
+                        }else if(partyLife > 30){
                             BR_launchParty(i);
                             i--;
                         }else{
@@ -106,15 +126,17 @@ public class QueueServices {
 
                                     //check if the party touches another party on the upper side
                                     if(((Bot.BR_parties.get(i).getEloMax() - otherEloMin) <= 0) &&
-                                            (Bot.BR_parties.get(i).getEloMax() + 200 + partyLife) >= otherEloMin){
+                                            (Bot.BR_parties.get(i).getEloMax() + 100 + partyLife) >= otherEloMin){
                                         //printing the return success or failure from combining the parties
                                         System.out.printf(QueueServices.BR_combineParties(i, x, BR_PartySizeLimit));
+                                        i--;
 
                                     //searches to see if the party will bump another on the low side and merge if possible
                                     }else if(((Bot.BR_parties.get(i).getEloMinimum() - otherEloMax) >= 0) &&
-                                            (Bot.BR_parties.get(i).getEloMinimum() - 200 - partyLife) < otherEloMax){
+                                            (Bot.BR_parties.get(i).getEloMinimum() - 100 - partyLife) < otherEloMax){
                                         //printing the return success or failure from combining the parties
                                         System.out.printf(QueueServices.BR_combineParties(i, x, BR_PartySizeLimit));
+                                        i--;
                                     }
                                     //an incrementer
                                     x++;
@@ -125,8 +147,10 @@ public class QueueServices {
                             //SECOND: Grow Zones
                             //------
                             //increase the range in which the party is searching for members by the life of the party
-                            Bot.BR_parties.get(i).setEloMinimum(eloStart - 200 - partyLife);
-                            Bot.BR_parties.get(i).setEloMax(eloStart + 200 + partyLife);
+                            Bot.BR_parties.get(i).setEloMinimum(eloStart - 100 - partyLife);
+                            Bot.BR_parties.get(i).setEloMax(eloStart + 100 + partyLife);
+                            System.out.printf("\nParty " + i + " Elo Max: " + Bot.BR_parties.get(i).getEloMax());
+                            System.out.printf("\nParty " + i + " Elo Min: " + Bot.BR_parties.get(i).getEloMinimum());
                         }
 
                         //OLD MCDONALD HAD A FARM AND ON THAT FARM HE HAD A FARM AND ON THAT FARM HE HAD A FARM AND ON-
@@ -215,29 +239,28 @@ public class QueueServices {
                     Bot.BR_parties.get(i).addPlayer(player);
                     MessageServices.sendMessage(player.getMessage(), "You have successfully queued for Battle Royal.");
                     return;
-                    //if we are at the end of the list of parties
+                //if the party we find has 10 players already
                 }else if((player.getBR_ELO() >= Bot.BR_parties.get(i).getEloMinimum()) &&
                 (player.getBR_ELO() <= Bot.BR_parties.get(i).getEloMax()) &&
-                        Bot.BR_parties.get(i).getPlayers().size() > 10){
-                    //make a party and launch the other party
+                        Bot.BR_parties.get(i).getPlayers().size() >= 10){
 
-                }else if(i+1 == Bot.BR_parties.size()){
-                    //make a list of our one player
-                    List<ProfileClass> players = new ArrayList<>();
-                    players.add(player);
+                    //launch party
+                    BR_launchParty(i);
 
-                    //create a party
-                    PartyClass newParty = new PartyClass(players, player.getBR_ELO(), player.getBR_ELO()+200, player.getBR_ELO()-200, System.currentTimeMillis());
-
-                    //add the new party to the BR_parties list
-                    Bot.BR_parties.add(newParty);
-
-                    //send a message
-                    MessageServices.sendMessage(player.getMessage(), "You have successfully queued for Battle Royal (Parties)");
+                    //start player
+                    BR_createParty(player);
 
                     //exit iterator
                     return;
-                    //if we aren't at the end of the list, just keep iterating
+
+                //if we're at the end of the list?
+                }else if(i+1 == Bot.BR_parties.size()){
+                    //start player
+                    BR_createParty(player);
+
+                    //exit iterator
+                    return;
+                //if we aren't at the end of the list, just keep iterating
                 }else{
                     i++;
                 }
@@ -250,7 +273,7 @@ public class QueueServices {
             players.add(player);
 
             //create a party if there are none
-            PartyClass newParty = new PartyClass(players, player.getBR_ELO(), player.getBR_ELO()+200, player.getBR_ELO()-199, System.currentTimeMillis());
+            PartyClass newParty = new PartyClass(players, player.getBR_ELO(), player.getBR_ELO()+200, player.getBR_ELO()-199, System.currentTimeMillis(), player);
 
             //add the new party to the BR_parties list
             Bot.BR_parties.add(newParty);
