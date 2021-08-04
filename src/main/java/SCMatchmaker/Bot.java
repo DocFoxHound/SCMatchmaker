@@ -29,6 +29,7 @@ public class Bot {
             QueueServices.BR_queuePartyManager();
         }).start();
         System.out.printf("Battle Royal Queue Party Manager online.\n");
+        System.out.printf("Matchmaker Running.\n");
 
         //logging into the bot and keeping it logged in
         String token = "ODU4Mzk1MTU4MjUxOTYyMzg4.YNdgyQ.6GLFlhhhE1HSGJfw0Fh_wvTurGQ";
@@ -44,8 +45,6 @@ public class Bot {
                     System.out.printf("Logged in as %s#%s%n", self.getUsername(), self.getDiscriminator()
                     );
                 });
-
-        System.out.printf("Matchmaker Running.\n");
 
         //check for the ! command
         client.getEventDispatcher().on(MessageCreateEvent.class)
@@ -69,8 +68,6 @@ public class Bot {
         //but I'm not sure how to do that. Also I may need to use .subscribe on login if I wanted
         //to use a daemon thread?
         client.onDisconnect().block();
-
-
     }
 
     //this is the command each server can setup to customize their bot, if need be. Right now it is static.

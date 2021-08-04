@@ -1,5 +1,6 @@
 package SCMatchmaker.Commands;
 
+import SCMatchmaker.EloManagerServices;
 import SCMatchmaker.MessageServices;
 import SCMatchmaker.Models.ProfileClass;
 import SCMatchmaker.SQLServices;
@@ -17,6 +18,10 @@ public class NewUser {
         //make a new profileclass object
         ProfileClass player = new ProfileClass();
 
+        //set the message field in the player class
+        player.setMessage(message);
+        player.setDiscordID(message.getUserData().id().toString());
+
         //getting the text of the user's command
         player.setCitizenURL(player.getMessage().getContent().toString());
 
@@ -28,7 +33,7 @@ public class NewUser {
         if(player.getCitizenURL().equals("")){
             MessageServices.sendMessage(player.getMessage(), ":small_red_triangle: Please use the new user command with your discord profile" +
                     "link afterwards. It should look similar to the following: \n" +
-                    "``!newuser https://robertsspaceindustries.com/citizens/YOUR_HANDLE_HERE``" +
+                    "```!newuser https://robertsspaceindustries.com/citizens/YOUR_HANDLE_HERE```" +
                     "\n:small_red_triangle: **PROCESS ABORTED**");
         }else{
             //-----------------------------
@@ -41,7 +46,7 @@ public class NewUser {
             //-----------------------------
 
             //check DataBase for DiscordID
-            if (SQLServices.existsDiscordID(player.getDiscordID(), player.getMessage()) == false) { //if the DiscordID doesn't exist, continue adding user
+            if (!SQLServices.existsDiscordID(player.getMessage())) { //if the DiscordID doesn't exist, continue adding user
                 //this checks if the user exists and returns their handle
                 List<String> userPage = ScraperServices.checkPageNewUser(player.getCitizenURL(), player.getMessage(), driver, wait); //inputs a String and Message, outputs a string list
 
@@ -65,10 +70,13 @@ public class NewUser {
 
                     //loading the user object
                     player.setUeeCitizenRecord(userPage.get(1));
-                    player.setDiscordUsername(player.getMessage().getUserData().username());
+                    player.setDiscordUsername(player.getMessage().getUserData().username()+"#"+player.getMessage().getUserData().discriminator());
                     player.setOrgID(userPage.get(2));
 
                     userPage = null;
+
+                    //set the default Elo's
+                    player.setBR_ELO(EloManagerServices.calculateInitialElo());
 
                     //process the database and return the readout to the user
                     MessageServices.sendMessage(player.getMessage(), SQLServices.setBR_Data(player));

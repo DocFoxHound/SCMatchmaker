@@ -10,6 +10,32 @@ import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 public class QueueServices {
+    public static void BR_launchParty(int i){
+        //make a copy of the party at that location
+        PartyClass party = Bot.BR_parties.get(i);
+
+        //starting the asynchronous Elo Manager function
+        new Thread (() -> {
+            EloManagerServices.BR_EloManager(party);
+        }).start();
+        System.out.printf("Battle Royal Elo Manager online.\n");
+
+        //make a list of players
+        String stringOfPlayers = new String();
+        for(ProfileClass player : party.getPlayers()){
+            stringOfPlayers = stringOfPlayers + "\n" + player.getHandle();
+        }
+
+        //send the list of names to the queued player
+        for(ProfileClass player : party.getPlayers()){
+            MessageServices.sendPrivateMessage(player.getUser(), "Your match is ready. The " +
+                    "following is the list of opponents that are queued with you: " + stringOfPlayers);
+        }
+
+        //remove the party from the master list
+        Bot.BR_parties.remove(i);
+    }
+
     public static void BR_queuePartyManager(){
         //constants
         int BR_PartySizeLimit = 10;
@@ -18,7 +44,7 @@ public class QueueServices {
         while(true){
             try {
                 //we'll check on the parties every so often
-                TimeUnit.SECONDS.sleep(5);
+                TimeUnit.SECONDS.sleep(10);
 
                 //get this iterations date/time
                 Date date = new Date();
@@ -53,56 +79,13 @@ public class QueueServices {
                         double eloStart = Bot.BR_parties.get(i).getEloStart();
 
                         //if there are so many players in a party, launch the party
-                        if (amountOfPlayers == BR_PartySizeLimit){
-                            //make a copy of the party at that location
-                            PartyClass party = Bot.BR_parties.get(i);
-
-                            //starting the asynchronous Elo Manager function
-                            new Thread (() -> {
-                                EloManagerServices.BR_EloManager(party);
-                            }).start();
-                            System.out.printf("Battle Royal Queue Party Manager online.\n");
-
-                            //make a list of players
-                            String stringOfPlayers = new String();
-                            for(ProfileClass player : party.getPlayers()){
-                                stringOfPlayers = stringOfPlayers + "\n" + player.getHandle();
-                            }
-
-                            //send the list of names to the queued player
-                            for(ProfileClass player : party.getPlayers()){
-                                MessageServices.sendPrivateMessage(player.getUser(), "Your match is ready. The " +
-                                        "following is the list of opponents that are queued with you: " + stringOfPlayers);
-                            }
-
-                            //remove the party from the master list
-                            Bot.BR_parties.remove(i);
-                        //if the life of the party is over 300 seconds, launch the party
-                        }else if(partyLife > 300){
-                            //make a copy of the party at that location
-                            PartyClass party = Bot.BR_parties.get(i);
-
-                            //starting the asynchronous Elo Manager function
-                            new Thread (() -> {
-                                EloManagerServices.BR_EloManager(party);
-                            }).start();
-                            System.out.printf("Battle Royal Queue Party Manager online.\n");
-
-                            //make a list of players
-                            String stringOfPlayers = new String();
-                            for(ProfileClass player : party.getPlayers()){
-                                stringOfPlayers = stringOfPlayers + "\n" + player.getHandle();
-                            }
-
-                            //send the list of names to the queued player
-                            for(ProfileClass player : party.getPlayers()){
-                                MessageServices.sendPrivateMessage(player.getUser(), "Your match is ready. The " +
-                                        "following is the list of opponents that are queued with you: " + stringOfPlayers);
-                            }
-
-                            //remove the party from the master list
-                            Bot.BR_parties.remove(i);
-
+                        if (amountOfPlayers >= BR_PartySizeLimit){
+                            BR_launchParty(i);
+                            i--;
+                        //if the life of the party is over 300 seconds (5 minutes), launch the party
+                        }else if(partyLife > 600){
+                            BR_launchParty(i);
+                            i--;
                         }else{
                         //------------------------
                         //MANAGEMENT STUFF
@@ -229,13 +212,18 @@ public class QueueServices {
                         (player.getBR_ELO() <= Bot.BR_parties.get(i).getEloMax()) &&
                         Bot.BR_parties.get(i).getPlayers().size() < 10)
                 {
-                        Bot.BR_parties.get(i).addPlayer(player);
-                        MessageServices.sendMessage(player.getMessage(), "You have successfully queued for Battle Royal.");
-                        return;
-                //create a party
-                }else if((i+1) > Bot.BR_parties.size()){
+                    Bot.BR_parties.get(i).addPlayer(player);
+                    MessageServices.sendMessage(player.getMessage(), "You have successfully queued for Battle Royal.");
+                    return;
+                    //if we are at the end of the list of parties
+                }else if((player.getBR_ELO() >= Bot.BR_parties.get(i).getEloMinimum()) &&
+                (player.getBR_ELO() <= Bot.BR_parties.get(i).getEloMax()) &&
+                        Bot.BR_parties.get(i).getPlayers().size() > 10){
+                    //make a party and launch the other party
+
+                }else if(i+1 == Bot.BR_parties.size()){
                     //make a list of our one player
-                    List<ProfileClass> players = null;
+                    List<ProfileClass> players = new ArrayList<>();
                     players.add(player);
 
                     //create a party
@@ -245,11 +233,11 @@ public class QueueServices {
                     Bot.BR_parties.add(newParty);
 
                     //send a message
-                    MessageServices.sendMessage(player.getMessage(), "You have successfully queued for Battle Royal (FIRST MEMBER)");
+                    MessageServices.sendMessage(player.getMessage(), "You have successfully queued for Battle Royal (Parties)");
 
                     //exit iterator
                     return;
-                //if we aren't at the end of the list, just keep iterating
+                    //if we aren't at the end of the list, just keep iterating
                 }else{
                     i++;
                 }
@@ -268,7 +256,7 @@ public class QueueServices {
             Bot.BR_parties.add(newParty);
 
             //send a message
-            MessageServices.sendMessage(player.getMessage(), "You have successfully queued for Battle Royal (PARTY LEADER)");
+            MessageServices.sendMessage(player.getMessage(), "You have successfully queued for Battle Royal (No Parties)");
         }
 
 

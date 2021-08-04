@@ -13,9 +13,13 @@ public class SQLServices {
     //check the battle royal database for the user's DiscordID. There's no instance in which a user would exist in one
     //but not the other database. The way I scrape the leaderboards is that if the player doesn't exist in
     //one leaderboard they are populated with all number one's.
-    public static boolean existsDiscordID(String DiscordID, Message message) {
+    public static boolean existsDiscordID(Message message) {
         //connection string and connection initiation
         Connection conn = null;
+
+        //set the discord ID
+        String DiscordID = message.getUserData().username().toString()+"#"+message.getUserData().discriminator();
+
         try {
             String connectionUrl = "jdbc:mysql://na01-sql.pebblehost.com:3306/customer_203228_users";
             conn = DriverManager.getConnection(connectionUrl, "customer_203228_users", "PRoA@fS6TXRhBn0QXWYy");
@@ -45,8 +49,12 @@ public class SQLServices {
                 return false;
             }
         } catch (SQLException e) {
+            if(e.toString().contains("Unknown column"))
+            {
+                return false;
+            }
             MessageServices.sendMessage(message, ":small_red_triangle: Connection error: " + e);
-            return true;
+            return false;
         }
     }
 
@@ -78,9 +86,6 @@ public class SQLServices {
             //so ResultSets do not have .isEmpty or .isNull properties, so this is how you check...
             //by the way, this is checking to see if said user exists.
             if (rs.getInt(1) == 1) {
-                MessageServices.sendMessage(message, ":small_red_triangle: This StarCitizen account already exists in the database! If you need to update your " +
-                        "Discord and Star Citizen accounts, please use the !updateme command like this:\n" +
-                        "`` !updateme https://robertsspaceindustries.com/citizens/YOUR_HANDLE_HERE ``");
                 conn.close();
                 return true;
             } else {
@@ -149,15 +154,53 @@ public class SQLServices {
 
             //tell the user what just happened and close the connection
             conn.close();
-            return ":small_blue_diamond: (4/5) User added to Arena Commander: Battle Royal database.";
+            return ":small_blue_diamond: User added to Arena Commander: Battle Royal database.";
         } catch (SQLException e) { //here we catch the errors
             //if the error is a duplicate error, let the user know what to do next
             if(e.toString().contains("Duplicate entry")){
-                return ":small_orange_diamond: (4/5) This Star Citizen account already exists in the Battle Royal database.";
+                return ":small_orange_diamond: This Star Citizen account already exists in the Battle Royal database.";
             }else{ //all other errors just spit it out into discord
                 //if the connection fails send this message
                 return ":small_red_triangle: SQL Error: " + e.toString();
             }
+        }
+    }
+
+    //TODO only works for BR right now
+    //update databases
+    public static String updateAlldBData(ProfileClass player){
+        //get date data
+        LocalDateTime now = LocalDateTime.now();
+        Timestamp sqlNow = Timestamp.valueOf(now);
+
+        //now we add them to the database
+        try
+        {
+            //connection string
+            String connectionUrl = "jdbc:mysql://na01-sql.pebblehost.com:3306/customer_203228_users";
+            Connection conn = DriverManager.getConnection(connectionUrl, "customer_203228_users", "PRoA@fS6TXRhBn0QXWYy");
+
+            //the SQL query. this, essentially, tells the Database what it's going to be inserting.
+            String query = "UPDATE ACBattleRoyal SET schandle = ?, discordid = ?, discordusername = ?, scorgsid = ?, lastupdated = ? WHERE ueecitizenrecord = ?";
+
+            // create the mysql insert preparedstatement and assign all the appropriate values from my two lists (userPage and leaderboard) into the database
+            PreparedStatement preparedStmt = conn.prepareStatement(query);
+            preparedStmt.setString(1, player.getHandle());
+            preparedStmt.setLong(2, Long.parseLong(player.getDiscordID()));
+            preparedStmt.setString(3, player.getDiscordUsername());
+            preparedStmt.setString(4, player.getOrgID());
+            preparedStmt.setTimestamp    (5, sqlNow); //lastupdated
+            preparedStmt.setLong   (6, Long.parseLong(player.getUeeCitizenRecord()));
+
+            // execute the preparedstatement and cram it all in there
+            preparedStmt.execute();
+
+            //tell the user what just happened and close the connection
+            conn.close();
+            return ":small_blue_diamond: User updated in the Arena Commander: Battle Royal database.";
+        } catch (SQLException e) { //here we catch the errors
+            //if the error is a duplicate error, let the user know what to do next
+            return e.toString();
         }
     }
 
@@ -194,6 +237,7 @@ public class SQLServices {
             //rotate next?
             rs.next();
 
+            String testHandle = rs.getString(1);
             player.setHandle(rs.getString(1));
             player.setBR_ELO(rs.getDouble(2));
             player.setBR_Playtime(rs.getInt(3));
@@ -209,6 +253,7 @@ public class SQLServices {
             return player;
 
         }catch(SQLException e){
+            System.out.printf("\nERROR: " + e.toString());
             player.setHandle("--CONNECTION ERROR--");
             return player;
         }

@@ -30,7 +30,7 @@ public class CommandServices {
             //here we are recognizing the queue command and passing off the message data to another method to handle.
             else if(command.startsWith("queue_br")){
                 MessageServices.sendMessage(message, "Queueing for Battle Royal...");
-                QueueBR.queuing(message, user);
+                QueueBR.BR_queuing(message, user);
                 return;
             }
             else if(command.startsWith("newuser")){
