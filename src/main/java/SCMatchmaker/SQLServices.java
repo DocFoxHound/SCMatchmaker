@@ -61,7 +61,7 @@ public class SQLServices {
     //check the battle royal database for the user's UEE number. There's no instance in which a user would exist in one
     //but not the other database. The way I scrape the leaderboards is that if the player doesn't exist in
     //one leaderboard they are populated with all number one's.
-    public static boolean existsUEENumber(String UEENumber, Message message) {
+    public static boolean existsUEENumber(String UEENumber) {
         //convert the string to a number
         int citizenrecord = parseInt(UEENumber);
 
@@ -93,7 +93,7 @@ public class SQLServices {
                 return false;
             }
         } catch (SQLException e) {
-            MessageServices.sendMessage(message, ":small_red_triangle: Connection error: " + e);
+            System.out.printf("Database Connection Error: " + e);
             return true;
         }
     }
@@ -118,18 +118,9 @@ public class SQLServices {
                     "schandle," + //2
                     "ueecitizenrecord," + //3
                     "discordusername," + //4
-                    "scorgsid," + //5
-                    "br_elo," + //6
-                    "playtime," + //7
-                    "damagedealt," + //8
-                    "damagetaken," + //9
-                    "matches," + //10
-                    "wins," + //11
-                    "losses," + //12
-                    "kills," + //13
-                    "deaths," + //14
-                    "lastupdated)" //15
-                    + " values (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)"; //its similar but different from other DB languages
+                    "br_elo," + //5
+                    "lastupdated)" //6
+                    + " values (?, ?, ?, ?, ?, ?)"; //its similar but different from other DB languages
 
             // create the mysql insert preparedstatement and assign all the appropriate values from my two lists (userPage and leaderboard) into the database
             PreparedStatement preparedStmt = conn.prepareStatement(query);
@@ -137,31 +128,23 @@ public class SQLServices {
             preparedStmt.setString(2, player.getHandle());
             preparedStmt.setInt(3, Integer.parseInt(player.getUeeCitizenRecord()));
             preparedStmt.setString(4, player.getDiscordUsername());
-            preparedStmt.setString(5, player.getOrgID());
-            preparedStmt.setDouble(6, player.getBR_ELO());
-            preparedStmt.setInt(7, player.getBR_Playtime());
-            preparedStmt.setLong(8, player.getBR_DamageDealt());
-            preparedStmt.setLong(9, player.getBR_DamageTaken());
-            preparedStmt.setInt(10, player.getBR_Matches());
-            preparedStmt.setInt(11, player.getBR_Wins());
-            preparedStmt.setInt(12, player.getBR_Losses());
-            preparedStmt.setInt(13, player.getBR_Kills());
-            preparedStmt.setInt(14, player.getBR_Deaths());
-            preparedStmt.setTimestamp    (15, sqlNow); //lastupdated
+            preparedStmt.setDouble(5, player.getBR_ELO());
+            preparedStmt.setTimestamp(6, sqlNow); //lastupdated
 
             // execute the preparedstatement and cram it all in there
             preparedStmt.execute();
 
             //tell the user what just happened and close the connection
             conn.close();
-            return ":small_blue_diamond: User added to Arena Commander: Battle Royal database.";
+            return ":small_blue_diamond: Welcome, new user!.";
         } catch (SQLException e) { //here we catch the errors
             //if the error is a duplicate error, let the user know what to do next
             if(e.toString().contains("Duplicate entry")){
                 return ":small_orange_diamond: This Star Citizen account already exists in the Battle Royal database.";
             }else{ //all other errors just spit it out into discord
                 //if the connection fails send this message
-                return ":small_red_triangle: SQL Error: " + e.toString();
+                System.out.printf("\nERROR: " + e.toString());
+                return ":small_red_triangle: SQL Error";
             }
         }
     }
@@ -205,10 +188,7 @@ public class SQLServices {
     }
 
     //get BattleRoyal
-    public static ProfileClass getBR_Data(Message message){
-        ProfileClass player = new ProfileClass();
-        player.setDiscordID(message.getUserData().id().toString());
-
+    public static ProfileClass getBR_Data(ProfileClass player){
         //connection string and connection initiation
         Connection conn = null;
         try{
@@ -216,17 +196,8 @@ public class SQLServices {
             conn = DriverManager.getConnection(connectionUrl, "customer_203228_users", "PRoA@fS6TXRhBn0QXWYy");
 
             //the SQL query to get the whole database by DiscordID
-            String Query = "SELECT schandle, " + //1
-                    "br_elo," + //2
-                    "playtime," + //3
-                    "damagedealt," + //4
-                    "damagetaken," + //5
-                    "matches," + //6
-                    "wins," + //7
-                    "losses," + //8
-                    "kills," + //9
-                    "deaths" + //10
-                    " FROM ACBattleRoyal WHERE discordid = " + player.getDiscordID();
+            String Query = "SELECT br_elo, " + //1
+                    " FROM ACBattleRoyal WHERE ueecitizenrecord = " + player.getUeeCitizenRecord();
 
             //create the java statement that we'll save this as
             Statement st = conn.createStatement();
@@ -237,17 +208,7 @@ public class SQLServices {
             //rotate next?
             rs.next();
 
-            String testHandle = rs.getString(1);
-            player.setHandle(rs.getString(1));
-            player.setBR_ELO(rs.getDouble(2));
-            player.setBR_Playtime(rs.getInt(3));
-            player.setBR_DamageDealt(rs.getLong(4));
-            player.setBR_DamageTaken(rs.getLong(5));
-            player.setBR_Matches(rs.getInt(6));
-            player.setBR_Wins(rs.getInt(7));
-            player.setBR_Losses(rs.getInt(8));
-            player.setBR_Kills(rs.getInt(9));
-            player.setBR_Deaths(rs.getInt(10));
+            player.setBR_ELO(rs.getDouble(1));
 
             //return the list
             return player;

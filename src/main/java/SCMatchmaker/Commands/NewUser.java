@@ -1,19 +1,7 @@
 package SCMatchmaker.Commands;
 
-import SCMatchmaker.EloManagerServices;
-import SCMatchmaker.MessageServices;
-import SCMatchmaker.Models.ProfileClass;
-import SCMatchmaker.SQLServices;
-import SCMatchmaker.ScraperServices;
-import discord4j.core.object.entity.Message;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.support.ui.WebDriverWait;
-
-import java.util.List;
-
 public class NewUser {
+    /*
     public static void newUser(Message message){
         //make a new profileclass object
         ProfileClass player = new ProfileClass();
@@ -93,4 +81,6 @@ public class NewUser {
             }
         }
     }
+
+     */
 }
