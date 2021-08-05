@@ -10,6 +10,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.net.URL;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.List;
 
 
 public class ScraperServices {
@@ -137,16 +139,20 @@ public class ScraperServices {
     }
 
     //check profile page
-    public static ProfileClass checkPageNewUser(ProfileClass player, WebDriver driver, String command) {
+    public static List<String> checkPageNewUser(String url, Message message, WebDriver driver, WebDriverWait wait) {
+
+        //place the results in an array list
+        List<String> resultsArray = new ArrayList<>();
+
         //put it all in a try-catch
         try{
             //navigate to a website
-            driver.navigate().to(player.getCitizenURL());
+            driver.navigate().to(url);
 
             //validating the URL
             boolean validURL;
             try {
-                new URL(player.getCitizenURL()).toURI();
+                new URL(url).toURI();
                 validURL = true;
             }catch (Exception e) {
                 validURL = false;
@@ -161,49 +167,69 @@ public class ScraperServices {
             }
 
             Boolean hasNumber;
-            String userDiscordId = player.getMessage().getUserData().id().toString();
+            String userDiscordId = message.getUserData().id().toString();
             if(driver.getPageSource().contains(userDiscordId)){
                 hasNumber = true;
             }else{
                 hasNumber = false;
             }
 
-            //if everything checks out, we get their uee number and that's it
+            //if everything checks out, we do work
             if(validURL==true && isRealUser==true && hasNumber==true) {
                 //get their UEE record number
-                player.setUeeCitizenRecord(driver.findElement(By.cssSelector("#public-profile > div.profile-content.overview-content.clearfix > p > strong")).getText().replaceAll("#", ""));
-                return player; //return to QueueXX
-            //if the URL doesn't match, we tell the user
+                String ueeCitRecord = driver.findElement(By.cssSelector("#public-profile > div.profile-content.overview-content.clearfix > p > strong")).getText().replaceAll("#", "");
+                ; //it literally pulls the hashtag with it, so you gotta dump it.
+
+                //check if the citrecord exists in the database. If it does, return an empty results array
+                if (SQLServices.existsUEENumber(ueeCitRecord, message) == true) {
+                    return resultsArray;
+                } else {//if the citizenrecord doesn't exist, finish scraping and return the elements in an array
+                    //get their handle
+                    String handle = driver.findElement(By.cssSelector("#public-profile > div.profile-content.overview-content.clearfix > div.box-content.profile-wrapper.clearfix > div > div.profile.left-col > div > div.info > p:nth-child(2) > strong")).getText();
+
+                    //get their Org SID
+                    String orgSID = driver.findElement(By.cssSelector("#public-profile > div.profile-content.overview-content.clearfix > div.box-content.profile-wrapper.clearfix > div > div.main-org.right-col.visibility-V > div > div.info > p:nth-child(2) > strong")).getText();
+
+                    //update user and close driver
+                    MessageServices.sendMessage(message, ":small_blue_diamond: Profile Page verified...");
+
+                    //place the results in an array list
+                    resultsArray.add(handle); //index: 0
+                    resultsArray.add(ueeCitRecord); //index: 1
+                    resultsArray.add(orgSID); //index: 2
+
+                    return resultsArray;
+                }
+                //if the URL doesn't match, we tell the user
             }else if(validURL == false) {
-                MessageServices.sendMessage(player.getMessage(), ":small_red_triangle: The URL had an error, please double check " +
+                MessageServices.sendMessage(message, ":small_red_triangle: The URL had an error, please double check " +
                         "and try again following this template:" +
-                        "\n```" + command + " YOUR_HANDLE_HERE```");
-                return player; //return to QueueXX
-            //if the page returned isn't a userpage, we tell the user
+                        "\n```!newuser https://robertsspaceindustries.com/citizens/YOUR_HANDLE_HERE```");
+                return resultsArray;
+                //if the page returned isn't a userpage, we tell the user
             }else if(isRealUser == false) {
-                MessageServices.sendMessage(player.getMessage(), ":small_red_triangle: That StarCitizen Handle doesn't exist, " +
+                MessageServices.sendMessage(message, ":small_red_triangle: That StarCitizen Handle doesn't exist, " +
                         "please check the handle again and follow this template:" +
-                        "\n```" + command + " YOUR_HANDLE_HERE```");
-                return player; //return to QueueXX
-            //if the page doesn't have the DiscordID, tell the user
+                        "\n```!newuser https://robertsspaceindustries.com/citizens/YOUR_HANDLE_HERE```");
+                return resultsArray;
+                //if the page doesn't have the DiscordID, tell the user
             }else if(hasNumber == false){
-                MessageServices.sendMessage(player.getMessage(), ":small_red_triangle: Please add your DiscordID to your profile page following these steps: " +
+                MessageServices.sendMessage(message, ":small_red_triangle: Please add your DiscordID to your profile page following these steps: " +
                         "\n1. Go to https://robertsspaceindustries.com/account/profile" +
                         "\n2. Go to the **'Short Bio'** section." +
-                        "\n3. Add the following numbers: **" + player.getMessage().getUserData().id() + "**" +
+                        "\n3. Add the following numbers: **" + message.getUserData().id() + "**" +
                         "\n4. Click **'Apply All Changes'** and retry the command!");
-                return player; //return to QueueXX
+                return resultsArray;
             }else{
-                MessageServices.sendMessage(player.getMessage(), ":small_red_triangle: There was an error verifying the new user.");
-                return player; //return to QueueXX
+                MessageServices.sendMessage(message, ":small_red_triangle: There was an error verifying the new user.");
+                return resultsArray;
             }
         }catch(Exception e) {
             System.out.printf("\nError: " + e);
-            return player;
+            return resultsArray;
         }
     }
 
-    /*
     //check profile page
     public static List<String> checkPageUpdateMe(String url, Message message, WebDriver driver, WebDriverWait wait) {
 
@@ -298,6 +324,4 @@ public class ScraperServices {
             return resultsArray;
         }
     }
-
-     */
 }

@@ -102,14 +102,14 @@ public class QueueServices {
                         if (amountOfPlayers >= BR_PartySizeLimit){
                             BR_launchParty(i);
                             i--;
-                        //if the life of the party is over 300 seconds (5 minutes), launch the party
+                            //if the life of the party is over 300 seconds (5 minutes), launch the party
                         }else if(partyLife > 30){
                             BR_launchParty(i);
                             i--;
                         }else{
-                        //------------------------
-                        //MANAGEMENT STUFF
-                        //------------------------
+                            //------------------------
+                            //MANAGEMENT STUFF
+                            //------------------------
 
                             //------
                             //FIRST: Party Touching
@@ -131,7 +131,7 @@ public class QueueServices {
                                         System.out.printf(QueueServices.BR_combineParties(i, x, BR_PartySizeLimit));
                                         i--;
 
-                                    //searches to see if the party will bump another on the low side and merge if possible
+                                        //searches to see if the party will bump another on the low side and merge if possible
                                     }else if(((Bot.BR_parties.get(i).getEloMinimum() - otherEloMax) >= 0) &&
                                             (Bot.BR_parties.get(i).getEloMinimum() - 100 - partyLife) < otherEloMax){
                                         //printing the return success or failure from combining the parties
@@ -156,11 +156,11 @@ public class QueueServices {
                         //OLD MCDONALD HAD A FARM AND ON THAT FARM HE HAD A FARM AND ON THAT FARM HE HAD A FARM AND ON-
                         i++;
                     }
-                //if there are no parties, we'll just do a heartbeat
+                    //if there are no parties, we'll just do a heartbeat
                 }else{
                     System.out.printf("\nHeartbeat: No BR_Parties as of " + formatter.format(date));
                 }
-            //this only exists because it has to
+                //this only exists because it has to
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
@@ -197,7 +197,7 @@ public class QueueServices {
             //print to console what happened
             return "\nBR_Party " + thatParty + " absorbed BR_party " + thisParty;
 
-        //if they can be combined and this party is older
+            //if they can be combined and this party is older
         }else if(((otherPartySize + thisPartySize) <= BR_PartySizeLimit) && (otherPartyLife < thisPartyLife)){
             //move players out of other party and into this one
             for (ProfileClass player : Bot.BR_parties.get(thatParty).getPlayers()){
@@ -218,9 +218,9 @@ public class QueueServices {
             //print to console what happened
             return "BR_Party " + thisParty + " absorbed BR_party " + thatParty;
 
-        //if they can't be combined, then it really isn't a problem anyway as the player
-        //is just inserted into whichever one is first on the list and then maybe they
-        //combine anyhow. Whatever, not even a minor problem.
+            //if they can't be combined, then it really isn't a problem anyway as the player
+            //is just inserted into whichever one is first on the list and then maybe they
+            //combine anyhow. Whatever, not even a minor problem.
         }else{
             return "\nBR_Parties " + thisParty + " and " + thatParty + " are overlapping. (no error)";
         }
@@ -239,9 +239,9 @@ public class QueueServices {
                     Bot.BR_parties.get(i).addPlayer(player);
                     MessageServices.sendMessage(player.getMessage(), "You have successfully queued for Battle Royal.");
                     return;
-                //if the party we find has 10 players already
+                    //if the party we find has 10 players already
                 }else if((player.getBR_ELO() >= Bot.BR_parties.get(i).getEloMinimum()) &&
-                (player.getBR_ELO() <= Bot.BR_parties.get(i).getEloMax()) &&
+                        (player.getBR_ELO() <= Bot.BR_parties.get(i).getEloMax()) &&
                         Bot.BR_parties.get(i).getPlayers().size() >= 10){
 
                     //launch party
@@ -253,14 +253,14 @@ public class QueueServices {
                     //exit iterator
                     return;
 
-                //if we're at the end of the list?
+                    //if we're at the end of the list?
                 }else if(i+1 == Bot.BR_parties.size()){
                     //start player
                     BR_createParty(player);
 
                     //exit iterator
                     return;
-                //if we aren't at the end of the list, just keep iterating
+                    //if we aren't at the end of the list, just keep iterating
                 }else{
                     i++;
                 }

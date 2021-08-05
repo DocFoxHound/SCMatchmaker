@@ -1,79 +1,76 @@
 package SCMatchmaker.Commands;
 
+import SCMatchmaker.Bot;
 import SCMatchmaker.MessageServices;
+import SCMatchmaker.Models.PartyClass;
 import SCMatchmaker.Models.ProfileClass;
 import SCMatchmaker.QueueServices;
 import SCMatchmaker.SQLServices;
-import SCMatchmaker.ScraperServices;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.chrome.ChromeDriver;
-import org.openqa.selenium.chrome.ChromeOptions;
-import org.openqa.selenium.support.ui.WebDriverWait;
 
 //This is the queue method, which will handle a lot of stuff.
 public class QueueBR {
     public static void BR_queuing(Message message, User user){
-        //-----------------------------Opening a Web Driver to help scrape-----------------------------//
-        //setup the headless browser before we run our scrapers. This makes the scraper faster and keeps it asynchronized
-        System.setProperty("webdriver.chrome.driver", "src/main/resources/chromedriver.exe"); //driver text
-        ChromeOptions options = new ChromeOptions(); //make the chrome driver
-        options.addArguments("--headless", "--disable-gpu", "--ignore-certificate-errors", "--blink-settings=imagesEnabled=false"); //make it headless
-        WebDriver driver = new ChromeDriver(options);//initializing the Chrome webbrowser driver
-        WebDriverWait wait = new WebDriverWait(driver, 5);//wait 5 seconds before timing out
-        //-------------------------------------------------------------------------------------------//
+        //check if player exists in database
+        if(!SQLServices.existsDiscordID(message)){
+            //create the user as a ProfileClass
+            ProfileClass player = SQLServices.getBR_Data(message);
 
-        //going to save the player's data in a profileclass
-        ProfileClass player = new ProfileClass();
+            //set the user field in ProfileClass
+            player.setUser(user);
 
-        //get the username from their text
-        if(message.getContent().toString().contains("lfbr")){
-            player.setHandle(message.getContent().replace("lfbr ", ""));
-        }else if(message.getContent().toString().contains("lf_br")){
-            player.setHandle(message.getContent().replace("lf_br ", ""));
-        }else{
-            MessageServices.sendMessage(message, "An error occurred at line 20 in QueueBR");
-            return;
-        }
+            //set the player message field
+            player.setMessage(message);
 
-        //setting some variables
-        player.setMessage(message);
-        player.setUser(user);
-        player.setCitizenURL("https://robertsspaceindustries.com/citizens/" + player.getHandle());
-        player.setDiscordUsername(message.getUserData().username()+"#"+message.getUserData().discriminator());
-        player.setDiscordID(message.getUserData().id().toString());
+            //check if userInfo came back with this error
+            if(player.getHandle().contains("--CONNECTION ERROR--")){ //its an error...
+                MessageServices.sendMessage(player.getMessage(), "You do not exist in the database, please use the following command:" +
+                        "\n```!newuser https://robertsspaceindustries.com/citizens/YOUR_HANDLE_HERE```");
+            }else{ //it was successful...
+                message.delete(); //delete the message -- garbage control
 
-        //remove garbage
-        message.delete();
-        user = null;
+                //a boolean to help me figure out if a player exists because I can't think of a better way to do it rn
+                boolean playerExists = false;
+                String partyPlayerExistsIn = "";
 
-        //verify user exists
-        player = ScraperServices.checkPageNewUser(player, driver, "!LFBR");
 
-        //doing some bools
-        boolean ueeNumInDB = player.getUeeCitizenRecord().isEmpty();
-        boolean usernameIsDifferent; //TODO check if the username is different
+                //make sure player isn't already in ANY list
+                for(PartyClass party : Bot.BR_parties){ //check Battle Royal parties
+                    String listOfNames = null;
+                    for(ProfileClass player_ : party.getPlayers()){
+                        listOfNames = listOfNames + player_.getHandle();
+                    }
+                    if(listOfNames.contains(player.getHandle())){
+                        playerExists = true;
+                        partyPlayerExistsIn = "Battle Royal.";
+                    }
+                }
 
-        //we check if the number came back empty. If it did then the process failed
-        if(ueeNumInDB == false){ //if it IS NOT empty
-            //TODO check if the player exists in the database. If so, return the player with Elo filled in.
-            if(SQLServices.existsUEENumber(player.getUeeCitizenRecord()) == true){
-                player = SQLServices.getBR_Data(player); //they have their Elo now.
+                //okay. NOW if the player exists in a list, we say so and end.
+                if (playerExists == true){
+                    MessageServices.sendMessage(message, "You already exist in a queue for: " + partyPlayerExistsIn);
+                    return;
 
-            //TODO if the ueenumber exists but the handle or discordID/username are different, edit the dB
-            }else if(true) {
+                    //otherwise, if the player isn't in a list, we go ahead and shuffle off to the BRqueue function in QueueServices
+                }else{
+                    //tell whats going on
+                    MessageServices.sendMessage(message, "Profile acquired, entering Battle Royal queue...");
 
-            }else{
-                //TODO if the player doesn't exist, populate them in the database and continue code
-                //set the player up in the database and return the feed to the user
-                MessageServices.sendMessage(player.getMessage(), SQLServices.setBR_Data(player));
+                    //insert player into BRqueue
+                    QueueServices.BR_queue(player);
+                    return;
+                }
             }
-            //pass it off to the QueueServices class to process
-            QueueServices.BR_queue(player);
-            return;
-        }else{ //if it is empty then we'll just end the code here
-            return;
+        }else{
+            MessageServices.sendMessage(message, "You either have not created an account or your discord profile" +
+                    "has changed, please use either of the following commands accordingly:" +
+                    "\nTo sign up:" +
+                    "\n```!newuser https://robertsspaceindustries.com/citizens/YOUR_HANDLE_HERE```" +
+                    "\n\nTo update your accound:" +
+                    "\n```!updateme https://robertsspaceindustries.com/citizens/YOUR_HANDLE_HERE```");
         }
+
+
     }
 }
