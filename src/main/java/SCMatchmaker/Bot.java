@@ -11,7 +11,7 @@ import discord4j.core.object.entity.User;
 import java.util.ArrayList;
 import java.util.List;
 
-//TODO this is the Looking For... branch
+//TODO this is the Looking For... branch. Again!
 public class Bot {
 
     //create the lists of matchmaking parties
