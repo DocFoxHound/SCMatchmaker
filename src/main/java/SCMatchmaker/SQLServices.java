@@ -93,8 +93,59 @@ public class SQLServices {
                 return false;
             }
         } catch (SQLException e) {
-            MessageServices.sendMessage(message, ":small_red_triangle: Connection error: " + e);
+            MessageServices.sendMessage(message, ":small_red_triangle: SQL Connection Error, please try again.");
             return true;
+        }
+    }
+
+    //get BattleRoyal
+    public static ProfileClass getBR_Data(ProfileClass player){
+        //connection string and connection initiation
+        Connection conn = null;
+        try{
+            String connectionUrl = "jdbc:mysql://na01-sql.pebblehost.com:3306/customer_203228_users";
+            conn = DriverManager.getConnection(connectionUrl, "customer_203228_users", "PRoA@fS6TXRhBn0QXWYy");
+
+            //the SQL query to get the whole database by DiscordID
+            String Query = "SELECT schandle, " + //1
+                    "br_elo," + //2
+                    "playtime," + //3
+                    "damagedealt," + //4
+                    "damagetaken," + //5
+                    "matches," + //6
+                    "wins," + //7
+                    "losses," + //8
+                    "kills," + //9
+                    "deaths" + //10
+                    " FROM ACBattleRoyal WHERE discordid = " + player.getDiscordID();
+
+            //create the java statement that we'll save this as
+            Statement st = conn.createStatement();
+
+            //execute query and get a java resultset
+            ResultSet rs = st.executeQuery(Query);
+
+            //rotate next?
+            rs.next();
+
+            player.setHandle(rs.getString(1));
+            player.setBR_ELO(rs.getDouble(2));
+            player.setBR_Playtime(rs.getInt(3));
+            player.setBR_DamageDealt(rs.getLong(4));
+            player.setBR_DamageTaken(rs.getLong(5));
+            player.setBR_Matches(rs.getInt(6));
+            player.setBR_Wins(rs.getInt(7));
+            player.setBR_Losses(rs.getInt(8));
+            player.setBR_Kills(rs.getInt(9));
+            player.setBR_Deaths(rs.getInt(10));
+
+            //return the list
+            return player;
+
+        }catch(SQLException e){
+            System.out.printf("\nERROR: " + e.toString());
+            player.setHandle("--CONNECTION ERROR--");
+            return player;
         }
     }
 
@@ -204,61 +255,6 @@ public class SQLServices {
         }
     }
 
-    //get BattleRoyal
-    public static ProfileClass getBR_Data(Message message){
-        ProfileClass player = new ProfileClass();
-        player.setDiscordID(message.getUserData().id().toString());
-
-        //connection string and connection initiation
-        Connection conn = null;
-        try{
-            String connectionUrl = "jdbc:mysql://na01-sql.pebblehost.com:3306/customer_203228_users";
-            conn = DriverManager.getConnection(connectionUrl, "customer_203228_users", "PRoA@fS6TXRhBn0QXWYy");
-
-            //the SQL query to get the whole database by DiscordID
-            String Query = "SELECT schandle, " + //1
-                    "br_elo," + //2
-                    "playtime," + //3
-                    "damagedealt," + //4
-                    "damagetaken," + //5
-                    "matches," + //6
-                    "wins," + //7
-                    "losses," + //8
-                    "kills," + //9
-                    "deaths" + //10
-                    " FROM ACBattleRoyal WHERE discordid = " + player.getDiscordID();
-
-            //create the java statement that we'll save this as
-            Statement st = conn.createStatement();
-
-            //execute query and get a java resultset
-            ResultSet rs = st.executeQuery(Query);
-
-            //rotate next?
-            rs.next();
-
-            String testHandle = rs.getString(1);
-            player.setHandle(rs.getString(1));
-            player.setBR_ELO(rs.getDouble(2));
-            player.setBR_Playtime(rs.getInt(3));
-            player.setBR_DamageDealt(rs.getLong(4));
-            player.setBR_DamageTaken(rs.getLong(5));
-            player.setBR_Matches(rs.getInt(6));
-            player.setBR_Wins(rs.getInt(7));
-            player.setBR_Losses(rs.getInt(8));
-            player.setBR_Kills(rs.getInt(9));
-            player.setBR_Deaths(rs.getInt(10));
-
-            //return the list
-            return player;
-
-        }catch(SQLException e){
-            System.out.printf("\nERROR: " + e.toString());
-            player.setHandle("--CONNECTION ERROR--");
-            return player;
-        }
-    }
-
     //set the BR elo for a player
     public static String setBR_Elo(ProfileClass player){
         //get date data
@@ -337,35 +333,75 @@ public class SQLServices {
         }
     }
 
-    //remove a user from all databases
-    public static String removeUser(String ueeCitNum){
-        try{
-            //connection string
+    //Database check-and-grab by DiscordID
+    public static ProfileClass searchByDiscordId(ProfileClass player) {
+        //connection string and connection initiation
+        Connection conn = null;
+
+        try {
             String connectionUrl = "jdbc:mysql://na01-sql.pebblehost.com:3306/customer_203228_users";
-            Connection conn = DriverManager.getConnection(connectionUrl, "customer_203228_users", "PRoA@fS6TXRhBn0QXWYy");
+            conn = DriverManager.getConnection(connectionUrl, "customer_203228_users", "PRoA@fS6TXRhBn0QXWYy");
 
-            String deleteBR = "DELETE FROM ACBattleRoyal where ueecitizenrecord = ?";
-            PreparedStatement preparedStmt = conn.prepareStatement(deleteBR);
-            preparedStmt.setInt(1, Integer.parseInt(ueeCitNum));
-            preparedStmt.execute();
+            //the SQL query to get the whole database by DiscordID
+            String query = "SELECT count(*) FROM ACBattleRoyal WHERE discordid = " + player.getDiscordID();
 
-            String deleteSB = "DELETE FROM ACSquadronBattle where ueecitizenrecord = ?";
-            PreparedStatement preparedStmt2 = conn.prepareStatement(deleteSB);
-            preparedStmt2.setInt(1, Integer.parseInt(ueeCitNum));
-            preparedStmt2.execute();
+            //create the java statement that we'll save this as
+            Statement st = conn.createStatement();
 
-            /*
-            String deleteD = "DELETE FROM ACDuel where ueecitizenrecord = ?";
-            PreparedStatement preparedStmt3 = conn.prepareStatement(deleteD);
-            preparedStmt3.setInt(1, Integer.parseInt(ueeCitNum));
-            preparedStmt3.execute();
+            //execute query and get a java resultset
+            ResultSet rs = st.executeQuery(query);
 
-             */
+            //rotate the resultset counter forward
+            rs.next();
 
-            conn.close();
-            return ":small_blue_diamond: Database cleared of user record, repopulating...";
-        }catch(SQLException e){
-            return ":small_red_diamond: There was an error removing the user from the database: " + e;
+            //so ResultSets do not have .isEmpty or .isNull properties, so this is how you check...
+            //by the way, this is checking to see if the player's DiscordID exists in the database
+            if (rs.getInt(1) == 1) {
+                //the SQL query to get the whole database by DiscordID
+                String query2 = "SELECT schandle, " + //1
+                        "br_elo," + //2
+                        "playtime," + //3
+                        "damagedealt," + //4
+                        "damagetaken," + //5
+                        "matches," + //6
+                        "wins," + //7
+                        "losses," + //8
+                        "kills," + //9
+                        "deaths" + //10
+                        " FROM ACBattleRoyal WHERE discordid = " + player.getDiscordID();
+
+                //execute query and get a java resultset
+                rs = st.executeQuery(query2);
+
+                //rotate next?
+                rs.next();
+
+                player.setHandle(rs.getString(1));
+                player.setBR_ELO(rs.getDouble(2));
+                player.setBR_Playtime(rs.getInt(3));
+                player.setBR_DamageDealt(rs.getLong(4));
+                player.setBR_DamageTaken(rs.getLong(5));
+                player.setBR_Matches(rs.getInt(6));
+                player.setBR_Wins(rs.getInt(7));
+                player.setBR_Losses(rs.getInt(8));
+                player.setBR_Kills(rs.getInt(9));
+                player.setBR_Deaths(rs.getInt(10));
+
+
+                conn.close();
+                //return the list
+                return player;
+            } else {
+                conn.close();
+                return player;
+            }
+        } catch (SQLException e) {
+            if(e.toString().contains("Unknown column"))
+            {
+                return player;
+            }
+            MessageServices.sendMessage(player.getMessage(), ":small_red_triangle: Connection error: " + e);
+            return player;
         }
     }
 

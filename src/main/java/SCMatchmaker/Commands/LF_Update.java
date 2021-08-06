@@ -12,8 +12,8 @@ import org.openqa.selenium.support.ui.WebDriverWait;
 
 import java.util.List;
 
-public class UpdateMe {
-    public static void UpdateMe(Message message){
+public class LF_Update {
+    public static void LF_Update(Message message){
         //make a new profileclass object
         ProfileClass player = new ProfileClass();
 
@@ -56,7 +56,7 @@ public class UpdateMe {
             }else{
                 //if userPage has data that means the check finished and the user was verified
                 //this scrapes the leaderboard into a ProfileClass.
-                player = ScraperServices.scrapeBattleRoyal(message, userPage.get(0), driver, wait);
+                player = ScraperServices.scrapeBattleRoyal(player, driver, wait);
 
                 //close the browser
                 driver.close();

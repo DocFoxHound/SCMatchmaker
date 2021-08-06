@@ -53,7 +53,7 @@ public class QueueServices {
         Bot.BR_parties.add(newParty);
 
         //send a message
-        MessageServices.sendMessage(player.getMessage(), "You have successfully queued for Battle Royal (Parties)");
+        MessageServices.sendMessage(player.getMessage(), "You have successfully queued for Battle Royal.");
     }
 
     public static void BR_queuePartyManager(){
@@ -224,64 +224,5 @@ public class QueueServices {
         }else{
             return "\nBR_Parties " + thisParty + " and " + thatParty + " are overlapping. (no error)";
         }
-    }
-
-    public static void BR_queue(ProfileClass player){
-        //Check if there are any parties in existence already. If the list isn't empty, then we iterate through the list
-        if(!Bot.BR_parties.isEmpty()){
-            //iterate through the list
-            for(int i = 0; i<Bot.BR_parties.size();){
-                //check if a party exists with the elo range of the player and that the party isn't full
-                if((player.getBR_ELO() >= Bot.BR_parties.get(i).getEloMinimum()) &&
-                        (player.getBR_ELO() <= Bot.BR_parties.get(i).getEloMax()) &&
-                        Bot.BR_parties.get(i).getPlayers().size() < 10)
-                {
-                    Bot.BR_parties.get(i).addPlayer(player);
-                    MessageServices.sendMessage(player.getMessage(), "You have successfully queued for Battle Royal.");
-                    return;
-                    //if the party we find has 10 players already
-                }else if((player.getBR_ELO() >= Bot.BR_parties.get(i).getEloMinimum()) &&
-                        (player.getBR_ELO() <= Bot.BR_parties.get(i).getEloMax()) &&
-                        Bot.BR_parties.get(i).getPlayers().size() >= 10){
-
-                    //launch party
-                    BR_launchParty(i);
-
-                    //start player
-                    BR_createParty(player);
-
-                    //exit iterator
-                    return;
-
-                    //if we're at the end of the list?
-                }else if(i+1 == Bot.BR_parties.size()){
-                    //start player
-                    BR_createParty(player);
-
-                    //exit iterator
-                    return;
-                    //if we aren't at the end of the list, just keep iterating
-                }else{
-                    i++;
-                }
-                //if no party has the elo area for the player, create one
-
-            }
-        }else{
-            //make a list of our one player
-            List<ProfileClass> players = new ArrayList<ProfileClass>();
-            players.add(player);
-
-            //create a party if there are none
-            PartyClass newParty = new PartyClass(players, player.getBR_ELO(), player.getBR_ELO()+200, player.getBR_ELO()-199, System.currentTimeMillis(), player);
-
-            //add the new party to the BR_parties list
-            Bot.BR_parties.add(newParty);
-
-            //send a message
-            MessageServices.sendMessage(player.getMessage(), "You have successfully queued for Battle Royal (No Parties)");
-        }
-
-
     }
 }

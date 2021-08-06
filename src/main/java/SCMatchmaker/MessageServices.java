@@ -1,6 +1,5 @@
 package SCMatchmaker;
 
-import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 
@@ -31,12 +30,5 @@ public class MessageServices {
         } else {
             throw new IllegalArgumentException("user object was null");
         }
-    }
-
-    public static Message sendMessageTest(Message message, String text){
-        Snowflake channelId = message.getChannelId();
-        String messageString = message.toString();
-        //Message newMessage = ;
-        return (message.getChannel().block().createMessage(text).block());
     }
 }

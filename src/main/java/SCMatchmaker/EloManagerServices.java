@@ -44,7 +44,7 @@ public class EloManagerServices {
             //iterate through the list of players we started with
             for(ProfileClass oldPlayerStats : party.getPlayers()){
                 //grab the new stats since the end of the last round
-                ProfileClass newPlayerStats = ScraperServices.scrapeBattleRoyal(oldPlayerStats.getMessage(),oldPlayerStats.getHandle(),driver, wait);
+                ProfileClass newPlayerStats = ScraperServices.scrapeBattleRoyal(oldPlayerStats,driver, wait);
 
                 //check if the player even played the match
                 if (oldPlayerStats.getBR_Playtime() != newPlayerStats.getBR_Playtime()){

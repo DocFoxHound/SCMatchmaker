@@ -1,8 +1,8 @@
 package SCMatchmaker;
 
-import SCMatchmaker.Commands.NewUser;
-import SCMatchmaker.Commands.QueueBR;
-import SCMatchmaker.Commands.UpdateMe;
+import SCMatchmaker.Commands.LF_BR;
+import SCMatchmaker.Commands.LF_Register;
+import SCMatchmaker.Commands.LF_Update;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.User;
 
@@ -23,26 +23,25 @@ public class CommandServices {
                 MessageServices.sendMessage(message, "Pong!");
                 return;
             }
-            else if(command.startsWith("help")){
+            else if(command.startsWith("lf_help")){
                 MessageServices.sendMessage(message, "This is the help menu, which is not yet developed.");
                 return;
             }
-            //here we are recognizing the queue command and passing off the message data to another method to handle.
-            else if(command.startsWith("queue_br")){
-                MessageServices.sendMessage(message, "Queueing for Battle Royal...");
-                QueueBR.BR_queuing(message, user);
-                return;
-            }
-            else if(command.startsWith("newuser")){
+            else if(command.startsWith("lf_register")){
                 MessageServices.sendMessage(message, "**ADDING NEW USER**" +
                         "\nPlease wait...");
-                NewUser.newUser(message);
+                LF_Register.newUser(message);
                 return;
             }
-            else if(command.startsWith("updateme")){
+            else if(command.startsWith("lf_update")){
                 MessageServices.sendMessage(message, "**UPDATING USER**" +
                         "\nPease wait...");
-                UpdateMe.UpdateMe(message);
+                LF_Update.LF_Update(message);
+                return;
+            }
+            else if(command.startsWith("lfbr") || command.startsWith("lf_br")){
+                MessageServices.sendMessage(message, "Looking For...**BATTLE ROYAL**");
+                LF_BR.LFBR(message, user);
                 return;
             }
             else{
